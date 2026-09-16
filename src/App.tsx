@@ -73,14 +73,14 @@ export default function App() {
 
   const loadData = async () => {
     try {
-      const [fetchedRequests, fetchedAvailability] = await Promise.all([
+      const [fetchedRequests, fetchedSchedule] = await Promise.all([
         api.getRequests(),
-        api.getAvailability()
+        api.getSchedule()
       ]);
       setRequests(fetchedRequests);
-      setAvailability(fetchedAvailability);
+      setSchedule(fetchedSchedule);
     } catch (e) {
-      console.error("Error loading data from mock backend", e);
+      console.error("Error loading data from backend", e);
     } finally {
       setIsDataLoaded(true);
     }
@@ -216,32 +216,29 @@ export default function App() {
 
   // --- Availability ---
   const addAvailability = async (slot: Omit<AvailabilitySlot, "id">) => {
-    const newSlot = await api.addAvailability(slot);
-    setAvailability(as => [...as, newSlot]);
+    // Deprecated, use Schedule instead
   };
   
   const deleteAvailability = async (id: string) => {
-    setAvailability(as => as.filter(a => a.id !== id));
-    await api.deleteAvailability(id);
   };
   
   const toggleAvailability = async (id: string) => {
-    setAvailability(as => as.map(a => a.id === id ? { ...a, type: a.type === "available" ? "blocked" : "available" } : a));
-    await api.toggleAvailability(id);
   };
 
   // --- Schedule ---
-  const addScheduleEvent = (event: Omit<ScheduleEvent, "id">) => {
-    const newEvent = { ...event, id: `se${Date.now()}` } as ScheduleEvent;
+  const addScheduleEvent = async (event: Omit<ScheduleEvent, "id">) => {
+    const newEvent = await api.addScheduleEvent(event);
     setSchedule(s => [...s, newEvent]);
   };
 
-  const updateScheduleEvent = (id: string, updated: Partial<ScheduleEvent>) => {
+  const updateScheduleEvent = async (id: string, updated: Partial<ScheduleEvent>) => {
     setSchedule(s => s.map(ev => ev.id === id ? { ...ev, ...updated } : ev));
+    await api.updateScheduleEvent(id, updated);
   };
 
-  const deleteScheduleEvent = (id: string) => {
+  const deleteScheduleEvent = async (id: string) => {
     setSchedule(s => s.filter(ev => ev.id !== id));
+    await api.deleteScheduleEvent(id);
   };
 
   // --- Faculty Subjects ---

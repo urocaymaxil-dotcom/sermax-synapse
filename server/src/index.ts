@@ -1,6 +1,6 @@
 import express from 'express';
 import cors from 'cors';
-import db, { initDb } from './db';
+import pool, { initDb } from './db';
 
 const app = express();
 const port = process.env.PORT || 3001;
@@ -8,6 +8,7 @@ const port = process.env.PORT || 3001;
 app.use(cors());
 app.use(express.json());
 
+// Initialize database
 initDb();
 
 // --- Auth Endpoints ---
@@ -21,72 +22,110 @@ app.post('/api/auth/login', (req, res) => {
 });
 
 // --- Requests Endpoints ---
-app.get('/api/requests', (req, res) => {
-  db.all('SELECT * FROM requests ORDER BY createdAt DESC', [], (err, rows) => {
-    if (err) return res.status(500).json({ error: err.message });
+app.get('/api/requests', async (req, res) => {
+  try {
+    const { rows } = await pool.query('SELECT * FROM requests ORDER BY "createdAt" DESC');
     res.json(rows);
-  });
+  } catch (err: any) {
+    res.status(500).json({ error: err.message });
+  }
 });
 
-app.post('/api/requests', (req, res) => {
-  const { studentName, section, subject, preferredDate, preferredTime, purpose } = req.body;
+app.post('/api/requests', async (req, res) => {
+  const { studentId, studentName, section, facultyId, facultyName, subject, concern, mode, description, preferredDate, preferredTime, duration, hasDeadline, deadline } = req.body;
   const id = `r${Date.now()}`;
   const status = 'Pending';
   const priorityScore = Math.floor(50 + Math.random() * 40);
-  const waitDays = 0;
-  const displacementCount = 0;
   const createdAt = new Date().toISOString();
 
   const query = `
-    INSERT INTO requests (id, studentName, section, subject, preferredDate, preferredTime, purpose, status, priorityScore, waitDays, displacementCount, createdAt)
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    INSERT INTO requests (id, "studentId", "studentName", section, "facultyId", "facultyName", subject, concern, mode, description, "preferredDate", "preferredTime", duration, "hasDeadline", deadline, status, "priorityScore", "createdAt")
+    VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18)
+    RETURNING *
   `;
-  db.run(query, [id, studentName, section, subject, preferredDate, preferredTime, purpose, status, priorityScore, waitDays, displacementCount, createdAt], function(err) {
-    if (err) return res.status(500).json({ error: err.message });
-    res.json({ id, status, priorityScore, createdAt });
-  });
+  try {
+    const { rows } = await pool.query(query, [id, studentId, studentName, section, facultyId, facultyName, subject, concern, mode, description, preferredDate, preferredTime, duration, hasDeadline, deadline, status, priorityScore, createdAt]);
+    res.json(rows[0]);
+  } catch (err: any) {
+    res.status(500).json({ error: err.message });
+  }
 });
 
-app.put('/api/requests/:id', (req, res) => {
+app.put('/api/requests/:id', async (req, res) => {
   const { id } = req.params;
   const updates = req.body;
   
-  const fields = Object.keys(updates).map(k => `${k} = ?`).join(', ');
+  const fields = Object.keys(updates).map((k, i) => `"${k}" = $${i + 1}`).join(', ');
   const values = Object.values(updates);
   
   if (!fields) return res.status(400).json({ error: 'No fields to update' });
   
-  db.run(`UPDATE requests SET ${fields} WHERE id = ?`, [...values, id], function(err) {
-    if (err) return res.status(500).json({ error: err.message });
-    res.json({ success: true, updated: this.changes });
-  });
+  try {
+    const { rowCount } = await pool.query(`UPDATE requests SET ${fields} WHERE id = $${values.length + 1}`, [...values, id]);
+    res.json({ success: true, updated: rowCount });
+  } catch (err: any) {
+    res.status(500).json({ error: err.message });
+  }
 });
 
-// --- Availability Endpoints ---
-app.get('/api/availability', (req, res) => {
-  db.all('SELECT * FROM availability', [], (err, rows) => {
-    if (err) return res.status(500).json({ error: err.message });
-    res.json(rows);
-  });
+// --- Schedule Endpoints ---
+app.get('/api/schedule', async (req, res) => {
+  try {
+    const { rows } = await pool.query('SELECT * FROM schedule');
+    // days is stored as JSON string, parse it back
+    const formatted = rows.map(r => ({
+      ...r,
+      days: r.days ? JSON.parse(r.days) : []
+    }));
+    res.json(formatted);
+  } catch (err: any) {
+    res.status(500).json({ error: err.message });
+  }
 });
 
-app.post('/api/availability', (req, res) => {
-  const { facultyId, dayOfWeek, date, startTime, endTime, type } = req.body;
-  const id = `avail${Date.now()}`;
+app.post('/api/schedule', async (req, res) => {
+  const { title, type, days, startTime, endTime, recurring, location, mode, studentName, section } = req.body;
+  const id = `ev${Date.now()}`;
   
-  const query = `INSERT INTO availability (id, facultyId, dayOfWeek, date, startTime, endTime, type) VALUES (?, ?, ?, ?, ?, ?, ?)`;
-  db.run(query, [id, facultyId, dayOfWeek, date, startTime, endTime, type], function(err) {
-    if (err) return res.status(500).json({ error: err.message });
-    res.json({ id });
-  });
+  const query = `
+    INSERT INTO schedule (id, title, type, days, "startTime", "endTime", recurring, location, mode, "studentName", section) 
+    VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
+    RETURNING *
+  `;
+  try {
+    const { rows } = await pool.query(query, [id, title, type, JSON.stringify(days || []), startTime, endTime, recurring, location, mode, studentName, section]);
+    res.json({ ...rows[0], days: JSON.parse(rows[0].days) });
+  } catch (err: any) {
+    res.status(500).json({ error: err.message });
+  }
 });
 
-app.delete('/api/availability/:id', (req, res) => {
+app.put('/api/schedule/:id', async (req, res) => {
   const { id } = req.params;
-  db.run(`DELETE FROM availability WHERE id = ?`, id, function(err) {
-    if (err) return res.status(500).json({ error: err.message });
-    res.json({ success: true, deleted: this.changes });
-  });
+  const updates = { ...req.body };
+  if (updates.days) updates.days = JSON.stringify(updates.days);
+
+  const fields = Object.keys(updates).map((k, i) => `"${k}" = $${i + 1}`).join(', ');
+  const values = Object.values(updates);
+  
+  if (!fields) return res.status(400).json({ error: 'No fields to update' });
+  
+  try {
+    const { rowCount } = await pool.query(`UPDATE schedule SET ${fields} WHERE id = $${values.length + 1}`, [...values, id]);
+    res.json({ success: true, updated: rowCount });
+  } catch (err: any) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+app.delete('/api/schedule/:id', async (req, res) => {
+  const { id } = req.params;
+  try {
+    const { rowCount } = await pool.query(`DELETE FROM schedule WHERE id = $1`, [id]);
+    res.json({ success: true, deleted: rowCount });
+  } catch (err: any) {
+    res.status(500).json({ error: err.message });
+  }
 });
 
 // Start server

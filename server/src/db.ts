@@ -1,59 +1,65 @@
-import sqlite3 from 'sqlite3';
-import path from 'path';
-import fs from 'fs';
+import { Pool } from 'pg';
+import dotenv from 'dotenv';
+dotenv.config();
 
-const dbPath = path.resolve(__dirname, 'database.sqlite');
-const db = new sqlite3.Database(dbPath);
+const pool = new Pool({
+  connectionString: process.env.DATABASE_URL || 'postgres://postgres:postgres@localhost:5432/synapse',
+  ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false
+});
 
-export const initDb = () => {
-  db.serialize(() => {
+export const initDb = async () => {
+  const client = await pool.connect();
+  try {
     // Create Requests Table
-    db.run(`
+    await client.query(`
       CREATE TABLE IF NOT EXISTS requests (
-        id TEXT PRIMARY KEY,
-        studentId TEXT,
-        studentName TEXT,
-        section TEXT,
-        subject TEXT,
-        preferredDate TEXT,
-        preferredTime TEXT,
-        purpose TEXT,
-        status TEXT,
-        priorityScore INTEGER,
-        waitDays INTEGER,
-        displacementCount INTEGER,
-        createdAt TEXT,
-        facultyNotes TEXT,
-        alternativeDate TEXT,
-        alternativeTime TEXT,
-        completedAt TEXT,
-        outcome TEXT
+        id VARCHAR(255) PRIMARY KEY,
+        "studentId" VARCHAR(255),
+        "studentName" VARCHAR(255),
+        section VARCHAR(255),
+        "facultyId" VARCHAR(255),
+        "facultyName" VARCHAR(255),
+        subject VARCHAR(255),
+        concern VARCHAR(255),
+        mode VARCHAR(255),
+        description TEXT,
+        "preferredDate" VARCHAR(255),
+        "preferredTime" VARCHAR(255),
+        duration INTEGER,
+        "hasDeadline" BOOLEAN,
+        deadline VARCHAR(255),
+        status VARCHAR(255),
+        "priorityScore" INTEGER,
+        "createdAt" VARCHAR(255),
+        "facultyNotes" TEXT,
+        "alternativeDate" VARCHAR(255),
+        "alternativeTime" VARCHAR(255),
+        "completedAt" VARCHAR(255),
+        outcome VARCHAR(255)
       )
     `);
 
-    // Create Availability Table
-    db.run(`
-      CREATE TABLE IF NOT EXISTS availability (
-        id TEXT PRIMARY KEY,
-        facultyId TEXT,
-        dayOfWeek TEXT,
-        date TEXT,
-        startTime TEXT,
-        endTime TEXT,
-        type TEXT
+    // Create Schedule Table
+    await client.query(`
+      CREATE TABLE IF NOT EXISTS schedule (
+        id VARCHAR(255) PRIMARY KEY,
+        title VARCHAR(255),
+        type VARCHAR(255),
+        days TEXT,
+        "startTime" VARCHAR(255),
+        "endTime" VARCHAR(255),
+        recurring BOOLEAN,
+        location VARCHAR(255),
+        mode VARCHAR(255),
+        "studentName" VARCHAR(255),
+        section VARCHAR(255)
       )
     `);
-
-    // Insert dummy availability if empty
-    db.get('SELECT count(*) as count FROM availability', (err, row: any) => {
-      if (row && row.count === 0) {
-        const stmt = db.prepare('INSERT INTO availability (id, facultyId, dayOfWeek, date, startTime, endTime, type) VALUES (?, ?, ?, ?, ?, ?, ?)');
-        stmt.run('avail1', 'f1', 'Monday', '2023-11-20', '13:00', '15:00', 'available');
-        stmt.run('avail2', 'f1', 'Wednesday', '2023-11-22', '10:00', '12:00', 'available');
-        stmt.finalize();
-      }
-    });
-  });
+  } catch (err) {
+    console.error('Error initializing database:', err);
+  } finally {
+    client.release();
+  }
 };
 
-export default db;
+export default pool;

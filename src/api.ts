@@ -1,93 +1,64 @@
-import { ConsultationRequest, AvailabilitySlot } from './types';
-import { INITIAL_REQUESTS, INITIAL_AVAILABILITY } from './data';
+import { ConsultationRequest, ScheduleEvent } from './types';
 
-const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
-
-// In-memory fallback in case localStorage is blocked by iframe sandboxing
-let memoryStorage: Record<string, any> = {};
-
-const getStorage = <T>(key: string, initialData: T): T => {
-  try {
-    const data = localStorage.getItem(key);
-    if (data) return JSON.parse(data);
-    localStorage.setItem(key, JSON.stringify(initialData));
-    return initialData;
-  } catch (e) {
-    console.warn("localStorage is not available, using in-memory fallback", e);
-    if (!memoryStorage[key]) {
-      memoryStorage[key] = initialData;
-    }
-    return memoryStorage[key] as T;
-  }
-};
-
-const setStorage = <T>(key: string, data: T) => {
-  try {
-    localStorage.setItem(key, JSON.stringify(data));
-  } catch (e) {
-    memoryStorage[key] = data;
-  }
-};
+const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:3001/api';
 
 export const api = {
   // Requests
   getRequests: async (): Promise<ConsultationRequest[]> => {
-    await delay(300);
-    return getStorage<ConsultationRequest[]>('synapse_requests', INITIAL_REQUESTS);
+    const res = await fetch(`${API_BASE}/requests`);
+    if (!res.ok) throw new Error('Failed to fetch requests');
+    return res.json();
   },
   
   submitRequest: async (req: Partial<ConsultationRequest>): Promise<ConsultationRequest> => {
-    await delay(300);
-    const requests = getStorage<ConsultationRequest[]>('synapse_requests', INITIAL_REQUESTS);
-    
-    const newReq: ConsultationRequest = {
-      ...req,
-      id: `r${Date.now()}`,
-      status: "Pending",
-      priorityScore: Math.floor(50 + Math.random() * 40),
-      waitDays: 0,
-      displacementCount: 0,
-      createdAt: new Date().toISOString(),
-    } as ConsultationRequest;
-
-    const newRequests = [newReq, ...requests];
-    setStorage('synapse_requests', newRequests);
-    return newReq;
+    const res = await fetch(`${API_BASE}/requests`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(req)
+    });
+    if (!res.ok) throw new Error('Failed to submit request');
+    return res.json();
   },
 
   updateRequest: async (id: string, updates: Partial<ConsultationRequest>): Promise<void> => {
-    await delay(300);
-    const requests = getStorage<ConsultationRequest[]>('synapse_requests', INITIAL_REQUESTS);
-    const newRequests = requests.map(r => r.id === id ? { ...r, ...updates } : r);
-    setStorage('synapse_requests', newRequests);
+    const res = await fetch(`${API_BASE}/requests/${id}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(updates)
+    });
+    if (!res.ok) throw new Error('Failed to update request');
   },
 
-  // Availability
-  getAvailability: async (): Promise<AvailabilitySlot[]> => {
-    await delay(300);
-    return getStorage<AvailabilitySlot[]>('synapse_availability', INITIAL_AVAILABILITY);
+  // Schedule
+  getSchedule: async (): Promise<ScheduleEvent[]> => {
+    const res = await fetch(`${API_BASE}/schedule`);
+    if (!res.ok) throw new Error('Failed to fetch schedule');
+    return res.json();
   },
 
-  addAvailability: async (slot: Partial<AvailabilitySlot>): Promise<AvailabilitySlot> => {
-    await delay(300);
-    const avail = getStorage<AvailabilitySlot[]>('synapse_availability', INITIAL_AVAILABILITY);
-    const newSlot: AvailabilitySlot = { ...slot, id: `avail${Date.now()}` } as AvailabilitySlot;
-    const newAvail = [...avail, newSlot];
-    setStorage('synapse_availability', newAvail);
-    return newSlot;
+  addScheduleEvent: async (event: Partial<ScheduleEvent>): Promise<ScheduleEvent> => {
+    const res = await fetch(`${API_BASE}/schedule`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(event)
+    });
+    if (!res.ok) throw new Error('Failed to add schedule event');
+    return res.json();
   },
 
-  deleteAvailability: async (id: string): Promise<void> => {
-    await delay(300);
-    const avail = getStorage<AvailabilitySlot[]>('synapse_availability', INITIAL_AVAILABILITY);
-    const newAvail = avail.filter(a => a.id !== id);
-    setStorage('synapse_availability', newAvail);
+  updateScheduleEvent: async (id: string, updates: Partial<ScheduleEvent>): Promise<void> => {
+    const res = await fetch(`${API_BASE}/schedule/${id}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(updates)
+    });
+    if (!res.ok) throw new Error('Failed to update schedule event');
   },
-  
-  toggleAvailability: async (id: string): Promise<void> => {
-    await delay(300);
-    const avail = getStorage<AvailabilitySlot[]>('synapse_availability', INITIAL_AVAILABILITY);
-    const newAvail = avail.map(a => a.id === id ? { ...a, type: a.type === "available" ? "blocked" : "available" } : a);
-    setStorage('synapse_availability', newAvail);
+
+  deleteScheduleEvent: async (id: string): Promise<void> => {
+    const res = await fetch(`${API_BASE}/schedule/${id}`, {
+      method: 'DELETE'
+    });
+    if (!res.ok) throw new Error('Failed to delete schedule event');
   }
 };
