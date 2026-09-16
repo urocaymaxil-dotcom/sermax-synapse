@@ -1,0 +1,10 @@
+{
+  "description": "This web application streamlines research management by integrating essential features for organizing, analyzing, and presenting data effectively for researchers.",
+  "robots": {
+    "index": false
+  },
+  "accessibility": {
+    "addBypassLinks": false,
+    "ignoreReducedMotion": false
+  }
+}

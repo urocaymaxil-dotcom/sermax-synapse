@@ -1,0 +1,133 @@
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=Inter:wght@400;500;600;700&display=swap');
+@import 'tailwindcss';
+
+@theme {
+  --font-family-sans: 'Inter', sans-serif;
+  --font-family-display: 'DM Sans', sans-serif;
+}
+
+* {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+*::-webkit-scrollbar {
+  display: none;
+}
+
+body {
+  font-family: 'Inter', sans-serif;
+  background-color: #eef2ff;
+}
+
+.font-display {
+  font-family: 'DM Sans', sans-serif;
+}
+
+.nav-active {
+  background-color: #eff6ff;
+  border-left: 3px solid #1d4ed8;
+  color: #1d4ed8;
+}
+
+.nav-item {
+  border-left: 3px solid transparent;
+  transition: all 0.15s ease;
+}
+
+.nav-item:hover {
+  background-color: #f8fafc;
+}
+
+.status-pending { background-color: #fef3c7; color: #92400e; }
+.status-approved { background-color: #d1fae5; color: #065f46; }
+.status-confirmed { background-color: #dbeafe; color: #1e40af; }
+.status-declined { background-color: #fee2e2; color: #991b1b; }
+.status-waitlisted { background-color: #ede9fe; color: #5b21b6; }
+.status-completed { background-color: #f0fdf4; color: #166534; }
+.status-cancelled { background-color: #f1f5f9; color: #475569; }
+.status-info { background-color: #fff7ed; color: #9a3412; }
+.status-alternative { background-color: #fdf4ff; color: #7e22ce; }
+.status-noshow { background-color: #fef2f2; color: #7f1d1d; }
+
+.event-class { background-color: #dbeafe; border-left: 3px solid #3b82f6; color: #1e40af; }
+.event-meeting { background-color: #fef3c7; border-left: 3px solid #f59e0b; color: #92400e; }
+.event-blocked { background-color: #f1f5f9; border-left: 3px solid #94a3b8; color: #475569; }
+.event-consultation { background-color: #d1fae5; border-left: 3px solid #10b981; color: #065f46; }
+.event-availability { background-color: #ede9fe; border-left: 3px solid #8b5cf6; color: #5b21b6; }
+
+.priority-high { color: #dc2626; }
+.priority-medium { color: #d97706; }
+.priority-low { color: #2563eb; }
+
+input:focus, select:focus, textarea:focus {
+  outline: none;
+  box-shadow: 0 0 0 2px #bfdbfe;
+  border-color: #3b82f6;
+}
+
+.card {
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04);
+}
+
+.gradient-text {
+  background: linear-gradient(135deg, #1d4ed8 0%, #059669 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.sidebar-logo-bg {
+  background: linear-gradient(135deg, #1e40af 0%, #0d9488 100%);
+}
+
+.stat-card-blue { background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%); }
+.stat-card-green { background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%); }
+.stat-card-red { background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%); }
+.stat-card-purple { background: linear-gradient(135deg, #ede9fe 0%, #ddd6fe 100%); }
+
+.calendar-day {
+  width: 36px; height: 36px;
+  display: flex; align-items: center; justify-content: center;
+  border-radius: 50%; font-size: 13px; cursor: pointer;
+  transition: all 0.15s;
+}
+.calendar-day:hover { background: #eff6ff; color: #1d4ed8; }
+.calendar-day.today { background: #1d4ed8; color: white; font-weight: 600; }
+.calendar-day.has-event::after {
+  content: '';
+  position: absolute;
+  bottom: 2px;
+  width: 4px; height: 4px;
+  background: #10b981;
+  border-radius: 50%;
+}
+
+.timeline-line {
+  position: absolute;
+  left: 0; top: 0; bottom: 0;
+  width: 2px;
+  background: linear-gradient(to bottom, #1d4ed8, #059669);
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.fade-in { animation: fadeIn 0.2s ease; }
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 20px;
+  height: 20px;
+  border-radius: 10px;
+  font-size: 11px;
+  font-weight: 600;
+  background: #dc2626;
+  color: white;
+  padding: 0 5px;
+}
