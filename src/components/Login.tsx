@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import logo from "@/imports/ChatGPT_Image_Sep_16__2026__02_42_11_AM-removebg-preview.png";
 
 interface LoginProps {
-  onLogin: (role: "faculty" | "student", user: {name: string, email: string}) => void;
+  onLogin: (role: "faculty" | "student", user: {id: string, name: string, email: string}) => void;
 }
 
 export default function Login({ onLogin }: LoginProps) {
@@ -20,8 +20,8 @@ export default function Login({ onLogin }: LoginProps) {
     const existingUsers = localStorage.getItem("sermax_users");
     if (!existingUsers) {
       const defaultUsers = [
-        { email: "faculty@demo.com", password: "password", name: "Dr. Maria Santos", role: "faculty" },
-        { email: "student@demo.com", password: "password", name: "Juan Dela Cruz", role: "student" }
+        { id: "f1", email: "faculty@demo.com", password: "password", name: "Dr. Maria Santos", role: "faculty" },
+        { id: "s1", email: "student@demo.com", password: "password", name: "Juan Dela Cruz", role: "student" }
       ];
       localStorage.setItem("sermax_users", JSON.stringify(defaultUsers));
     }
@@ -60,16 +60,16 @@ export default function Login({ onLogin }: LoginProps) {
           return;
         }
         
-        const newUser = { email, password, name, role };
+        const newUser = { id: `${role}_${Date.now()}`, email, password, name, role };
         users.push(newUser);
         localStorage.setItem("sermax_users", JSON.stringify(users));
         
-        onLogin(role, { name, email });
+        onLogin(role, { id: newUser.id, name, email });
       } else {
         // Sign In Logic
         const user = users.find((u: any) => u.email === email && u.password === password);
         if (user) {
-          onLogin(user.role, { name: user.name, email: user.email });
+          onLogin(user.role, { id: user.id || (user.role === 'faculty' ? 'f1' : 's1'), name: user.name, email: user.email });
         } else {
           setError("Invalid email or password.");
         }

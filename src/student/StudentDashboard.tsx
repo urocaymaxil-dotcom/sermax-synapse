@@ -6,12 +6,12 @@ interface Props {
   notifications: AppNotification[];
   onNav: (v: string) => void;
   userName: string;
+  userId: string;
 }
 
-const MY_STUDENT_ID = "s1";
 
-export default function StudentDashboard({ requests, notifications, onNav, userName }: Props) {
-  const myRequests = requests.filter(r => r.studentId === MY_STUDENT_ID);
+export default function StudentDashboard({ requests, notifications, onNav, userName, userId }: Props) {
+  const myRequests = requests.filter(r => r.studentId === userId || r.studentName === userName);
   const pending = myRequests.filter(r => ["Pending","Waitlisted"].includes(r.status));
   const upcoming = myRequests.filter(r => ["Confirmed","Approved"].includes(r.status));
   const completed = myRequests.filter(r => r.status === "Completed");

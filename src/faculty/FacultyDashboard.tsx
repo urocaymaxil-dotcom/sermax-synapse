@@ -9,6 +9,7 @@ interface Props {
   onApprove: (id: string) => void;
   onDecline: (id: string) => void;
   userName: string;
+  userId: string;
 }
 
 
@@ -65,10 +66,11 @@ function MiniCalendar() {
   );
 }
 
-export default function FacultyDashboard({ requests, notifications, onNav, onApprove, onDecline, userName }: Props) {
-  const pending = requests.filter(r => r.status === "Pending");
-  const upcoming = requests.filter(r => ["Confirmed", "Approved"].includes(r.status));
-  const waitlisted = requests.filter(r => r.status === "Waitlisted");
+export default function FacultyDashboard({ requests, notifications, onNav, onApprove, onDecline, userName, userId }: Props) {
+  const myRequests = requests.filter(r => r.facultyId === userId || r.facultyName === userName);
+  const pending = myRequests.filter(r => r.status === "Pending");
+  const upcoming = myRequests.filter(r => ["Confirmed", "Approved"].includes(r.status));
+  const waitlisted = myRequests.filter(r => r.status === "Waitlisted");
   const availabilityBlocks = 12;
 
   const recentPending = pending.slice(0, 3);

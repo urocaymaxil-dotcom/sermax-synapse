@@ -8,9 +8,9 @@ interface Props {
   onCancelRequest: (id: string) => void;
   onEditRequest?: (id: string, updated: Partial<ConsultationRequest>) => void;
   onNav: (v: string) => void;
+  userId: string;
 }
 
-const MY_STUDENT_ID = "s1";
 
 const STATUS_HELP: Partial<Record<ConsultationStatus, string>> = {
   "Pending": "Your request is in the queue, awaiting faculty review.",
@@ -24,11 +24,11 @@ const STATUS_HELP: Partial<Record<ConsultationStatus, string>> = {
   "Cancelled": "This consultation was cancelled.",
 };
 
-export default function StudentConsultations({ requests, onAcceptAlternative, onCancelRequest, onEditRequest, onNav }: Props) {
+export default function StudentConsultations({ requests, onAcceptAlternative, onCancelRequest, onEditRequest, onNav, userId }: Props) {
   const [filter, setFilter] = useState<ConsultationStatus | "All">("All");
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editForm, setEditForm] = useState({ concern: "" as any, description: "" });
-  const myRequests = requests.filter(r => r.studentId === MY_STUDENT_ID);
+  const myRequests = requests.filter(r => r.studentId === userId);
   const filtered = filter === "All" ? myRequests : myRequests.filter(r => r.status === filter);
 
   const statuses = Array.from(new Set(myRequests.map(r => r.status)));

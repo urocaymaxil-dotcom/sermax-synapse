@@ -5,19 +5,22 @@ import { formatDate, formatTime, getStatusClass } from "../data";
 interface Props {
   requests: ConsultationRequest[];
   onRecordOutcome: (id: string, outcome: string, notes: string) => void;
+  userName: string;
+  userId: string;
 }
 
 const OUTCOMES = ["Resolved", "Partially Resolved", "Follow-up Required", "Referred", "Cancelled", "No-show"];
 
-export default function FacultyHistory({ requests, onRecordOutcome }: Props) {
+export default function FacultyHistory({ requests, onRecordOutcome, userName, userId }: Props) {
   const [filter, setFilter] = useState<string>("All");
   const [search, setSearch] = useState("");
   const [recordingId, setRecordingId] = useState<string | null>(null);
   const [outcomeForm, setOutcomeForm] = useState({ outcome: "Resolved", notes: "" });
 
-  const completed = requests.filter(r => ["Completed", "Cancelled", "No-show", "Declined"].includes(r.status));
-  const active = requests.filter(r => ["Confirmed", "Approved"].includes(r.status));
-  const needsOutcome = requests.filter(r => r.status === "Confirmed" && !r.outcome);
+  const myRequests = requests.filter(r => r.facultyId === userId || r.facultyName === userName);
+  const completed = myRequests.filter(r => ["Completed", "Cancelled", "No-show", "Declined"].includes(r.status));
+  const active = myRequests.filter(r => ["Confirmed", "Approved"].includes(r.status));
+  const needsOutcome = myRequests.filter(r => r.status === "Confirmed" && !r.outcome);
 
   const allHistory = [...completed, ...active];
   const filtered = allHistory
@@ -36,9 +39,9 @@ export default function FacultyHistory({ requests, onRecordOutcome }: Props) {
       {/* Summary cards */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
         {[
-          { label: "Total Consultations", value: requests.length, color: "#1d4ed8", bg: "#dbeafe" },
-          { label: "Completed", value: requests.filter(r => r.status === "Completed").length, color: "#059669", bg: "#d1fae5" },
-          { label: "Cancelled/Declined", value: requests.filter(r => ["Cancelled","Declined"].includes(r.status)).length, color: "#dc2626", bg: "#fee2e2" },
+          { label: "Total Consultations", value: myRequests.length, color: "#1d4ed8", bg: "#dbeafe" },
+          { label: "Completed", value: myRequests.filter(r => r.status === "Completed").length, color: "#059669", bg: "#d1fae5" },
+          { label: "Cancelled/Declined", value: myRequests.filter(r => ["Cancelled","Declined"].includes(r.status)).length, color: "#dc2626", bg: "#fee2e2" },
           { label: "Needs Outcome", value: needsOutcome.length, color: "#d97706", bg: "#fef3c7" },
         ].map(s => (
           <div key={s.label} className="card p-4">

@@ -7,8 +7,10 @@ interface Props {
   onApprove: (id: string) => void;
   onDecline: (id: string) => void;
   onInfoRequest: (id: string, note: string) => void;
-  onProposeAlternative: (id: string, date: string, time: string, note: string) => void;
+  onProposeAlternative: (id: string, date: string, time: string, message: string) => void;
   onWaitlist: (id: string) => void;
+  userName: string;
+  userId: string;
 }
 
 const ALL_STATUSES: (ConsultationStatus | "All")[] = [
@@ -187,23 +189,25 @@ function RequestCard({
   );
 }
 
-export default function FacultyRequests({ requests, onApprove, onDecline, onInfoRequest, onProposeAlternative, onWaitlist }: Props) {
-  const [filter, setFilter] = useState<ConsultationStatus | "All">("All");
+export default function FacultyRequests({ requests, onApprove, onDecline, onWaitlist, onInfoRequest, onProposeAlternative, userName, userId }: Props) {
+  const [filter, setFilter] = useState<ConsultationStatus | "All">("Pending");
   const [search, setSearch] = useState("");
   const [sort, setSort] = useState<"priority" | "date" | "wait">("priority");
+
+  const myRequests = requests.filter(r => r.facultyId === userId || r.facultyName === userName);
 
   // Constraint-Aware Scheduling Conflict Detection
   const checkConflict = (req: ConsultationRequest) => {
     if (!["Pending", "Waitlisted", "Info Requested"].includes(req.status)) return false;
     // Basic interval conflict detection against existing approved/confirmed sessions
-    return requests.some(other => 
+    return myRequests.some(other => 
       (other.status === "Confirmed" || other.status === "Approved") &&
       other.preferredDate === req.preferredDate &&
       other.preferredTime === req.preferredTime
     );
   };
 
-  const filtered = requests
+  const filtered = myRequests
     .filter(r => filter === "All" || r.status === filter)
     .filter(r => !search || r.studentName.toLowerCase().includes(search.toLowerCase()) || r.subject.toLowerCase().includes(search.toLowerCase()))
     .sort((a, b) => {
@@ -212,8 +216,8 @@ export default function FacultyRequests({ requests, onApprove, onDecline, onInfo
       return a.preferredDate.localeCompare(b.preferredDate);
     });
 
-  const pending = requests.filter(r => r.status === "Pending").length;
-  const waitlisted = requests.filter(r => r.status === "Waitlisted").length;
+  const pending = myRequests.filter(r => r.status === "Pending").length;
+  const waitlisted = myRequests.filter(r => r.status === "Waitlisted").length;
 
   return (
     <div>
@@ -244,14 +248,14 @@ export default function FacultyRequests({ requests, onApprove, onDecline, onInfo
           <span className="text-xs text-slate-400 ml-1">Strict First-In, First-Out (FIFO) Order</span>
         </div>
         <div className="flex gap-2 overflow-x-auto pb-2">
-          {requests.filter(r => r.status === "Pending").map((r, i) => (
+          {myRequests.filter(r => r.status === "Pending").map((r, i) => (
             <div key={r.id} className="flex-shrink-0 rounded-lg p-3 text-center flex flex-col items-center" style={{ background: i === 0 ? "#ecfdf5" : "#f8faff", border: `1px solid ${i === 0 ? "#a7f3d0" : "#e2e8f0"}`, minWidth: 120 }}>
               <div className="text-xs font-bold mb-1" style={{ color: i === 0 ? "#059669" : "#94a3b8" }}>{i === 0 ? "FRONT OF QUEUE" : `Pos: ${i+1}`}</div>
               <div className="text-sm font-semibold text-slate-700 truncate w-24">{r.studentName.split(" ")[0]}</div>
               <div className="text-xs text-slate-400 truncate w-24">{r.subject}</div>
             </div>
           ))}
-          {requests.filter(r => r.status === "Pending").length === 0 && (
+          {myRequests.filter(r => r.status === "Pending").length === 0 && (
             <div className="text-sm text-slate-400 italic">Queue is empty.</div>
           )}
         </div>
@@ -267,7 +271,7 @@ export default function FacultyRequests({ requests, onApprove, onDecline, onInfo
           <span className="text-xs text-slate-400 ml-1">(Wait time + Deadline proximity + Displacement count + Aging)</span>
         </div>
         <div className="flex gap-2 overflow-x-auto pb-2">
-          {requests.filter(r => ["Pending","Waitlisted"].includes(r.status)).sort((a,b) => b.priorityScore - a.priorityScore).slice(0,6).map((r, i) => (
+          {myRequests.filter(r => ["Pending","Waitlisted"].includes(r.status)).sort((a,b) => b.priorityScore - a.priorityScore).slice(0,6).map((r, i) => (
             <div key={r.id} className="flex-shrink-0 rounded-lg p-3 text-center" style={{ background: i === 0 ? "#fef3c7" : "#f8faff", border: `1px solid ${i === 0 ? "#fde68a" : "#e2e8f0"}`, minWidth: 110 }}>
               <div className="text-xs font-bold text-slate-500 mb-1">#{i+1}</div>
               <div className="text-xl font-display" style={{ color: i === 0 ? "#d97706" : "#1d4ed8" }}>{r.priorityScore}</div>
@@ -292,7 +296,7 @@ export default function FacultyRequests({ requests, onApprove, onDecline, onInfo
         <div className="flex gap-1 flex-wrap">
           {ALL_STATUSES.map(s => (
             <button key={s} onClick={() => setFilter(s)} className={`text-xs px-3 py-1.5 rounded-lg font-medium transition-all ${filter === s ? "bg-blue-600 text-white" : "bg-white text-slate-600 hover:bg-slate-50"}`} style={{ border: "1px solid #e2e8f0" }}>
-              {s} {s !== "All" ? `(${requests.filter(r => r.status === s).length})` : `(${requests.length})`}
+              {s} {s !== "All" ? `(${myRequests.filter(r => r.status === s).length})` : `(${myRequests.length})`}
             </button>
           ))}
         </div>
