@@ -151,6 +151,7 @@ interface TopBarProps {
   onNav: (v: ViewType) => void;
   searchQuery: string;
   onSearch: (q: string) => void;
+  profilePhoto: string | null;
 }
 
 const VIEW_TITLES: Record<string, string> = {
@@ -171,7 +172,7 @@ const VIEW_TITLES: Record<string, string> = {
   "student-profile": "Profile",
 };
 
-function TopBar({ role, view, notifications, unreadNotif, onNav, searchQuery, onSearch }: TopBarProps) {
+function TopBar({ role, view, notifications, unreadNotif, onNav, searchQuery, onSearch, profilePhoto }: TopBarProps) {
   const name = role === "faculty" ? "Dr. Maria Santos" : "Juan Dela Cruz";
   const title = role === "faculty" ? "Faculty Member" : "BSCS 2A";
   const initials = role === "faculty" ? "MS" : "JD";
@@ -216,8 +217,8 @@ function TopBar({ role, view, notifications, unreadNotif, onNav, searchQuery, on
           onClick={() => onNav(profileView)}
           className="flex items-center gap-2 px-3 py-1.5 rounded-lg hover:bg-slate-50 transition-colors"
         >
-          <div className="w-8 h-8 rounded-full flex items-center justify-center text-white text-xs font-bold flex-shrink-0" style={{ background: "linear-gradient(135deg, #1d4ed8, #059669)" }}>
-            {initials}
+          <div className="w-8 h-8 rounded-full flex items-center justify-center text-white text-xs font-bold flex-shrink-0 overflow-hidden" style={{ background: "linear-gradient(135deg, #1d4ed8, #059669)" }}>
+            {profilePhoto ? <img src={profilePhoto} alt="Profile" className="w-full h-full object-cover" /> : initials}
           </div>
           <div className="text-left hidden sm:block">
             <div className="text-sm font-semibold text-slate-800 font-display leading-tight">{name}</div>
@@ -244,9 +245,10 @@ interface LayoutProps {
   onSearch: (q: string) => void;
   theme: "light" | "dark";
   onToggleTheme: () => void;
+  profilePhoto: string | null;
 }
 
-export default function Layout({ role, view, onNav, notifications, unreadMessages, onLogout, children, searchQuery, onSearch, theme, onToggleTheme }: LayoutProps) {
+export default function Layout({ role, view, onNav, notifications, unreadMessages, onLogout, children, searchQuery, onSearch, theme, onToggleTheme, profilePhoto }: LayoutProps) {
   const unreadNotif = notifications.filter((n) => !n.read).length;
 
   return (
@@ -255,7 +257,7 @@ export default function Layout({ role, view, onNav, notifications, unreadMessage
         <Sidebar role={role} view={view} onNav={onNav} notifications={notifications} unreadMessages={unreadMessages} onLogout={onLogout} theme={theme} onToggleTheme={onToggleTheme} />
       </div>
       <div className="flex-1 flex flex-col overflow-hidden min-w-0">
-        <TopBar role={role} view={view} notifications={notifications} unreadNotif={unreadNotif} onNav={onNav} searchQuery={searchQuery} onSearch={onSearch} />
+        <TopBar role={role} view={view} notifications={notifications} unreadNotif={unreadNotif} onNav={onNav} searchQuery={searchQuery} onSearch={onSearch} profilePhoto={profilePhoto} />
         <main className="flex-1 overflow-y-auto p-6 fade-in">
           {children}
         </main>

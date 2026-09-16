@@ -4,6 +4,9 @@ import { formatTime } from "../data";
 
 interface Props {
   schedule: ScheduleEvent[];
+  onAddEvent?: (event: Omit<ScheduleEvent, "id">) => void;
+  onEditEvent?: (id: string, updated: Partial<ScheduleEvent>) => void;
+  onDeleteEvent?: (id: string) => void;
 }
 
 const WEEKDAYS = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"];
@@ -26,9 +29,19 @@ const EVENT_COLORS: Record<string, { bg: string; border: string; text: string; l
   availability: { bg: "#ede9fe", border: "#8b5cf6", text: "#5b21b6", label: "Available" },
 };
 
-export default function FacultySchedule({ schedule }: Props) {
+export default function FacultySchedule({ schedule, onAddEvent, onEditEvent, onDeleteEvent }: Props) {
   const [viewMode, setViewMode] = useState<"week" | "day">("week");
   const [selectedDay, setSelectedDay] = useState("Monday");
+  const [showAddModal, setShowAddModal] = useState(false);
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [newEvent, setNewEvent] = useState({
+    title: "",
+    type: "class" as const,
+    days: ["Monday"],
+    startTime: "09:00",
+    endTime: "10:30",
+    recurring: true,
+  });
   const PX_PER_HOUR = 72;
 
   const daysToShow = viewMode === "week" ? WEEKDAYS : [selectedDay];
@@ -44,10 +57,33 @@ export default function FacultySchedule({ schedule }: Props) {
           <p className="text-slate-500 text-sm mt-1">Academic Year 2026–2027, First Semester</p>
         </div>
         <div className="flex items-center gap-3">
+          {/* Add Event Button */}
+          {onAddEvent && (
+            <button
+              onClick={() => {
+                setEditingId(null);
+                setNewEvent({
+                  title: "",
+                  type: "class",
+                  days: ["Monday"],
+                  startTime: "09:00",
+                  endTime: "10:30",
+                  recurring: true,
+                });
+                setShowAddModal(true);
+              }}
+              className="px-4 py-2 text-sm font-medium text-white rounded-lg transition-all hover:opacity-90 flex items-center gap-2"
+              style={{ background: "linear-gradient(135deg, #1d4ed8, #059669)" }}
+            >
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+              Add Event
+            </button>
+          )}
+
           {/* View toggle */}
-          <div className="flex rounded-lg overflow-hidden" style={{ border: "1px solid #e2e8f0" }}>
+          <div className="flex rounded-lg overflow-hidden" style={{ border: "1px solid var(--theme-border)" }}>
             {(["week", "day"] as const).map((m) => (
-              <button key={m} onClick={() => setViewMode(m)} className={`text-sm px-4 py-2 font-medium transition-all ${viewMode === m ? "bg-blue-600 text-white" : "bg-white text-slate-600 hover:bg-slate-50"}`}>
+              <button key={m} onClick={() => setViewMode(m)} className={`text-sm px-4 py-2 font-medium transition-all ${viewMode === m ? "bg-blue-600 text-white" : "bg-[var(--theme-bg-surface)] text-[var(--theme-text-muted)] hover:bg-[var(--theme-bg-base)]"}`}>
                 {m === "week" ? "Week" : "Day"}
               </button>
             ))}
@@ -55,7 +91,7 @@ export default function FacultySchedule({ schedule }: Props) {
 
           {/* Day selector for day view */}
           {viewMode === "day" && (
-            <select className="text-sm rounded-lg px-3 py-2 bg-white text-slate-700" style={{ border: "1px solid #e2e8f0" }} value={selectedDay} onChange={e => setSelectedDay(e.target.value)}>
+            <select className="text-sm rounded-lg px-3 py-2 bg-[var(--theme-bg-surface)] text-[var(--theme-text-main)]" style={{ border: "1px solid var(--theme-border)" }} value={selectedDay} onChange={e => setSelectedDay(e.target.value)}>
               {WEEKDAYS.map(d => <option key={d}>{d}</option>)}
             </select>
           )}
@@ -130,7 +166,21 @@ export default function FacultySchedule({ schedule }: Props) {
                         color: colors.text,
                         padding: "3px 5px",
                         zIndex: 1,
-                        cursor: "pointer",
+                        cursor: onEditEvent ? "pointer" : "default",
+                      }}
+                      onClick={() => {
+                        if (onEditEvent) {
+                          setEditingId(ev.id);
+                          setNewEvent({
+                            title: ev.title,
+                            type: ev.type as any,
+                            days: [...ev.days],
+                            startTime: ev.startTime,
+                            endTime: ev.endTime,
+                            recurring: ev.recurring,
+                          });
+                          setShowAddModal(true);
+                        }
                       }}
                     >
                       <div className="font-semibold truncate leading-tight">{ev.title}</div>
@@ -183,6 +233,99 @@ export default function FacultySchedule({ schedule }: Props) {
             })}
         </div>
       </div>
+
+      {/* Add/Edit Event Modal */}
+      {showAddModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm fade-in">
+          <div className="card p-6 w-full max-w-md" style={{ background: "var(--theme-bg-surface)" }}>
+            <h2 className="font-heading text-lg text-[var(--theme-text-main)] mb-4">{editingId ? "Edit Event" : "Add Schedule Event"}</h2>
+            <div className="space-y-4">
+              <div>
+                <label className="text-xs font-medium text-[var(--theme-text-muted)] mb-1 block">Title</label>
+                <input
+                  type="text"
+                  className="w-full rounded-lg px-3 py-2 text-sm bg-[var(--theme-bg-base)] text-[var(--theme-text-main)]"
+                  style={{ border: "1px solid var(--theme-border)" }}
+                  value={newEvent.title}
+                  onChange={e => setNewEvent(p => ({ ...p, title: e.target.value }))}
+                />
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="text-xs font-medium text-[var(--theme-text-muted)] mb-1 block">Type</label>
+                  <select
+                    className="w-full rounded-lg px-3 py-2 text-sm bg-[var(--theme-bg-base)] text-[var(--theme-text-main)]"
+                    style={{ border: "1px solid var(--theme-border)" }}
+                    value={newEvent.type}
+                    onChange={e => setNewEvent(p => ({ ...p, type: e.target.value as any }))}
+                  >
+                    <option value="class">Class</option>
+                    <option value="meeting">Meeting</option>
+                    <option value="blocked">Blocked</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="text-xs font-medium text-[var(--theme-text-muted)] mb-1 block">Day</label>
+                  <select
+                    className="w-full rounded-lg px-3 py-2 text-sm bg-[var(--theme-bg-base)] text-[var(--theme-text-main)]"
+                    style={{ border: "1px solid var(--theme-border)" }}
+                    value={newEvent.days[0]}
+                    onChange={e => setNewEvent(p => ({ ...p, days: [e.target.value] }))}
+                  >
+                    {WEEKDAYS.map(d => <option key={d} value={d}>{d}</option>)}
+                  </select>
+                </div>
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="text-xs font-medium text-[var(--theme-text-muted)] mb-1 block">Start Time</label>
+                  <input
+                    type="time"
+                    className="w-full rounded-lg px-3 py-2 text-sm bg-[var(--theme-bg-base)] text-[var(--theme-text-main)]"
+                    style={{ border: "1px solid var(--theme-border)" }}
+                    value={newEvent.startTime}
+                    onChange={e => setNewEvent(p => ({ ...p, startTime: e.target.value }))}
+                  />
+                </div>
+                <div>
+                  <label className="text-xs font-medium text-[var(--theme-text-muted)] mb-1 block">End Time</label>
+                  <input
+                    type="time"
+                    className="w-full rounded-lg px-3 py-2 text-sm bg-[var(--theme-bg-base)] text-[var(--theme-text-main)]"
+                    style={{ border: "1px solid var(--theme-border)" }}
+                    value={newEvent.endTime}
+                    onChange={e => setNewEvent(p => ({ ...p, endTime: e.target.value }))}
+                  />
+                </div>
+              </div>
+              <div className="flex justify-between pt-4 border-t border-[var(--theme-border)] mt-4">
+                {editingId && onDeleteEvent ? (
+                  <button onClick={() => { onDeleteEvent(editingId); setShowAddModal(false); }} className="px-4 py-2 text-sm text-red-600 hover:bg-red-50 rounded-lg transition-colors font-medium">Delete</button>
+                ) : <div />}
+                <div className="flex gap-3">
+                  <button onClick={() => setShowAddModal(false)} className="px-4 py-2 text-sm text-[var(--theme-text-muted)] hover:bg-[var(--theme-bg-base)] rounded-lg transition-colors">Cancel</button>
+                  <button
+                    onClick={() => {
+                      if (editingId && onEditEvent && newEvent.title && newEvent.startTime && newEvent.endTime) {
+                        onEditEvent(editingId, newEvent as any);
+                        setShowAddModal(false);
+                      } else if (!editingId && onAddEvent && newEvent.title && newEvent.startTime && newEvent.endTime) {
+                        onAddEvent(newEvent as any);
+                        setShowAddModal(false);
+                      }
+                    }}
+                    disabled={!newEvent.title || !newEvent.startTime || !newEvent.endTime}
+                    className="px-5 py-2 text-sm text-white rounded-lg font-medium transition-all hover:opacity-90 disabled:opacity-50"
+                    style={{ background: "linear-gradient(135deg, #1d4ed8, #059669)" }}
+                  >
+                    {editingId ? "Save Changes" : "Save Event"}
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

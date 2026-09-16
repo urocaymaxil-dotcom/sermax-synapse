@@ -1,7 +1,16 @@
 import { useState } from "react";
 import { FACULTY } from "../data";
 
-export default function FacultyProfile() {
+import type { FacultyRecord } from "../types";
+
+interface Props {
+  profilePhoto: string | null;
+  onUploadPhoto: (photo: string) => void;
+  faculty: FacultyRecord;
+  onUpdateSubjects: (subjects: string[]) => void;
+}
+
+export default function FacultyProfile({ profilePhoto, onUploadPhoto, faculty, onUpdateSubjects }: Props) {
   const [editing, setEditing] = useState(false);
   const [form, setForm] = useState({
     name: FACULTY.name,
@@ -13,7 +22,18 @@ export default function FacultyProfile() {
     notifyEmail: true,
     notifySystem: true,
     autoWaitlist: true,
+    subjects: faculty.subjectsHandled.join(", "),
   });
+
+  const handlePhotoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        onUploadPhoto(event.target?.result as string);
+      };
+      reader.readAsDataURL(e.target.files[0]);
+    }
+  };
 
   return (
     <div>
@@ -34,8 +54,17 @@ export default function FacultyProfile() {
         {/* Profile card */}
         <div className="lg:col-span-1">
           <div className="card p-6 text-center mb-4">
-            <div className="w-24 h-24 rounded-full flex items-center justify-center text-white text-3xl font-bold mx-auto mb-4" style={{ background: "linear-gradient(135deg, #1d4ed8, #059669)" }}>
-              MS
+            <div className="relative w-24 h-24 mx-auto mb-4 group">
+              <div className="w-full h-full rounded-full flex items-center justify-center text-white text-3xl font-bold overflow-hidden shadow-sm" style={{ background: "linear-gradient(135deg, #1d4ed8, #059669)" }}>
+                {profilePhoto ? <img src={profilePhoto} alt="Profile" className="w-full h-full object-cover" /> : "MS"}
+              </div>
+              {editing && (
+                <label className="absolute inset-0 bg-black/50 rounded-full flex flex-col items-center justify-center opacity-0 group-hover:opacity-100 cursor-pointer transition-opacity fade-in text-white text-xs font-medium">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mb-1"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+                  Upload
+                  <input type="file" className="hidden" accept="image/*" onChange={handlePhotoUpload} />
+                </label>
+              )}
             </div>
             <h2 className="font-display text-slate-900 text-xl">{FACULTY.name}</h2>
             <p className="text-slate-500 text-sm mt-1">{FACULTY.title}</p>
@@ -125,6 +154,19 @@ export default function FacultyProfile() {
               ))}
             </div>
 
+            <h3 className="font-heading text-slate-800 mb-4 mt-6">Subjects Handled (This Semester)</h3>
+            <div className="mb-4">
+              <label className="text-xs text-slate-500 font-medium mb-1 block">Comma-separated list of subjects</label>
+              <textarea
+                disabled={!editing}
+                className="w-full rounded-lg px-3 py-2 text-sm text-slate-700"
+                style={{ border: "1px solid #e2e8f0", background: editing ? "white" : "#f8fafc", minHeight: "80px" }}
+                value={form.subjects}
+                onChange={e => setForm(prev => ({ ...prev, subjects: e.target.value }))}
+                placeholder="e.g. Data Structures, Algorithms"
+              />
+            </div>
+            
             {/* Toggles */}
             <div className="space-y-3">
               {[
@@ -153,7 +195,10 @@ export default function FacultyProfile() {
           {editing && (
             <div className="flex justify-end gap-3">
               <button onClick={() => setEditing(false)} className="px-5 py-2 text-sm text-slate-600 hover:bg-slate-100 rounded-xl transition-colors">Cancel</button>
-              <button onClick={() => setEditing(false)} className="px-5 py-2 text-sm text-white rounded-xl font-medium hover:opacity-90 transition-all" style={{ background: "linear-gradient(135deg, #1d4ed8, #059669)" }}>Save Changes</button>
+              <button onClick={() => {
+                onUpdateSubjects(form.subjects.split(",").map(s => s.trim()).filter(Boolean));
+                setEditing(false);
+              }} className="px-5 py-2 text-sm text-white rounded-xl font-medium hover:opacity-90 transition-all" style={{ background: "linear-gradient(135deg, #1d4ed8, #059669)" }}>Save Changes</button>
             </div>
           )}
         </div>

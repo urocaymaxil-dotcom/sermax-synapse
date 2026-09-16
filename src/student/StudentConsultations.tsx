@@ -6,6 +6,7 @@ interface Props {
   requests: ConsultationRequest[];
   onAcceptAlternative: (id: string) => void;
   onCancelRequest: (id: string) => void;
+  onEditRequest?: (id: string, updated: Partial<ConsultationRequest>) => void;
   onNav: (v: string) => void;
 }
 
@@ -23,8 +24,10 @@ const STATUS_HELP: Partial<Record<ConsultationStatus, string>> = {
   "Cancelled": "This consultation was cancelled.",
 };
 
-export default function StudentConsultations({ requests, onAcceptAlternative, onCancelRequest, onNav }: Props) {
+export default function StudentConsultations({ requests, onAcceptAlternative, onCancelRequest, onEditRequest, onNav }: Props) {
   const [filter, setFilter] = useState<ConsultationStatus | "All">("All");
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [editForm, setEditForm] = useState({ concern: "" as any, description: "" });
   const myRequests = requests.filter(r => r.studentId === MY_STUDENT_ID);
   const filtered = filter === "All" ? myRequests : myRequests.filter(r => r.status === filter);
 
@@ -133,14 +136,77 @@ export default function StudentConsultations({ requests, onAcceptAlternative, on
               {/* Actions */}
               <div className="flex justify-end gap-2 mt-3 pt-3" style={{ borderTop: "1px solid #f8fafc" }}>
                 {["Pending","Waitlisted","Approved"].includes(req.status) && (
-                  <button onClick={() => onCancelRequest(req.id)} className="text-xs px-3 py-1.5 rounded-lg font-medium transition-all hover:bg-red-50" style={{ border: "1px solid #fca5a5", color: "#dc2626" }}>
-                    Cancel Request
-                  </button>
+                  <div className="flex gap-2">
+                    {req.status === "Pending" && onEditRequest && (
+                      <button onClick={() => { setEditingId(req.id); setEditForm({ concern: req.concern, description: req.description }); }} className="text-xs px-3 py-1.5 rounded-lg font-medium transition-all hover:bg-slate-50" style={{ border: "1px solid #cbd5e1", color: "#475569" }}>
+                        Edit Request
+                      </button>
+                    )}
+                    <button onClick={() => onCancelRequest(req.id)} className="text-xs px-3 py-1.5 rounded-lg font-medium transition-all hover:bg-red-50" style={{ border: "1px solid #fca5a5", color: "#dc2626" }}>
+                      Cancel Request
+                    </button>
+                  </div>
                 )}
                 <div className="text-xs text-slate-400 self-center">Priority Score: <strong className="text-slate-600">{req.priorityScore}</strong></div>
               </div>
             </div>
           ))}
+        </div>
+      )}
+
+      {/* Edit Modal */}
+      {editingId && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm fade-in">
+          <div className="card p-6 w-full max-w-md" style={{ background: "var(--theme-bg-surface)" }}>
+            <h2 className="font-heading text-lg text-[var(--theme-text-main)] mb-4">Edit Consultation Request</h2>
+            <div className="space-y-4">
+              <div>
+                <label className="text-xs font-medium text-[var(--theme-text-muted)] mb-1 block">Concern Type</label>
+                <select
+                  className="w-full rounded-lg px-3 py-2 text-sm bg-[var(--theme-bg-base)] text-[var(--theme-text-main)]"
+                  style={{ border: "1px solid var(--theme-border)" }}
+                  value={editForm.concern}
+                  onChange={e => setEditForm(p => ({ ...p, concern: e.target.value as any }))}
+                >
+                  <option value="Lesson Clarification">Lesson Clarification</option>
+                  <option value="Assignment Guidance">Assignment Guidance</option>
+                  <option value="Exam Review">Exam Review</option>
+                  <option value="Grade Concern">Grade Concern</option>
+                  <option value="Project Help">Project Help</option>
+                  <option value="Thesis / Capstone">Thesis / Capstone</option>
+                  <option value="Research">Research</option>
+                  <option value="Academic Advising">Academic Advising</option>
+                  <option value="Other">Other</option>
+                </select>
+              </div>
+              <div>
+                <label className="text-xs font-medium text-[var(--theme-text-muted)] mb-1 block">Description</label>
+                <textarea
+                  className="w-full rounded-lg px-3 py-2 text-sm bg-[var(--theme-bg-base)] text-[var(--theme-text-main)] resize-none"
+                  rows={4}
+                  style={{ border: "1px solid var(--theme-border)" }}
+                  value={editForm.description}
+                  onChange={e => setEditForm(p => ({ ...p, description: e.target.value }))}
+                />
+              </div>
+              <div className="flex justify-end gap-3 pt-4 border-t border-[var(--theme-border)] mt-4">
+                <button onClick={() => setEditingId(null)} className="px-4 py-2 text-sm text-[var(--theme-text-muted)] hover:bg-[var(--theme-bg-base)] rounded-lg transition-colors">Cancel</button>
+                <button
+                  onClick={() => {
+                    if (onEditRequest && editForm.concern && editForm.description) {
+                      onEditRequest(editingId, { concern: editForm.concern, description: editForm.description });
+                      setEditingId(null);
+                    }
+                  }}
+                  disabled={!editForm.concern || !editForm.description}
+                  className="px-5 py-2 text-sm text-white rounded-lg font-medium transition-all hover:opacity-90 disabled:opacity-50"
+                  style={{ background: "linear-gradient(135deg, #1d4ed8, #059669)" }}
+                >
+                  Save Changes
+                </button>
+              </div>
+            </div>
+          </div>
         </div>
       )}
     </div>

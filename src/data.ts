@@ -5,16 +5,40 @@ import type {
   Conversation,
   AppNotification,
   StudentRecord,
+  FacultyRecord,
 } from "./types";
 
-export const FACULTY = {
-  id: "f1",
-  name: "Dr. Maria Santos",
-  title: "Faculty Member",
-  department: "College of Information Technology",
-  email: "m.santos@unorinc.edu.ph",
-  initials: "MS",
-};
+export const FACULTIES: FacultyRecord[] = [
+  {
+    id: "f1",
+    name: "Dr. Maria Santos",
+    title: "Senior Faculty Member",
+    department: "College of Information Technology",
+    email: "m.santos@unorinc.edu.ph",
+    initials: "MS",
+    subjectsHandled: ["Data Structures", "Algorithms", "Programming Fundamentals"],
+  },
+  {
+    id: "f2",
+    name: "Prof. John Doe",
+    title: "Associate Professor",
+    department: "College of Information Technology",
+    email: "j.doe@unorinc.edu.ph",
+    initials: "JD",
+    subjectsHandled: ["Software Engineering", "Capstone Project"],
+  },
+  {
+    id: "f3",
+    name: "Dr. Ana Reyes",
+    title: "Department Head",
+    department: "College of Information Technology",
+    email: "a.reyes@unorinc.edu.ph",
+    initials: "AR",
+    subjectsHandled: ["Operating Systems", "Computer Networks", "Database Management", "Research Methods"],
+  }
+];
+
+export const FACULTY = FACULTIES[0]; // For current logged in faculty references
 
 export const STUDENT = {
   id: "s1",
@@ -323,15 +347,6 @@ export const INITIAL_SCHEDULE: ScheduleEvent[] = [
 ];
 
 export const INITIAL_AVAILABILITY: AvailabilitySlot[] = [
-  { id: "a1", day: "Monday", startTime: "08:00", endTime: "11:00", type: "available" },
-  { id: "a2", day: "Monday", startTime: "14:30", endTime: "17:00", type: "available" },
-  { id: "a3", day: "Tuesday", startTime: "08:00", endTime: "10:00", type: "available" },
-  { id: "a4", day: "Tuesday", startTime: "12:00", endTime: "16:00", type: "available" },
-  { id: "a5", day: "Wednesday", startTime: "09:00", endTime: "12:00", type: "available" },
-  { id: "a6", day: "Thursday", startTime: "08:00", endTime: "10:00", type: "available" },
-  { id: "a7", day: "Thursday", startTime: "13:00", endTime: "17:00", type: "available" },
-  { id: "a8", day: "Friday", startTime: "10:00", endTime: "12:00", type: "available" },
-  { id: "a9", day: "Friday", startTime: "14:00", endTime: "16:00", type: "available" },
   { id: "a10", day: "Wednesday", startTime: "14:00", endTime: "15:30", type: "blocked", note: "Department work" },
 ];
 

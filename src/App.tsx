@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import type { ViewType, ConsultationRequest, AvailabilitySlot, ChatMessage } from "./types";
+import type { ViewType, ConsultationRequest, AvailabilitySlot, ChatMessage, ScheduleEvent } from "./types";
 import { api } from "./api";
 import {
   INITIAL_SCHEDULE,
@@ -8,6 +8,7 @@ import {
   INITIAL_FACULTY_NOTIFICATIONS,
   INITIAL_STUDENT_NOTIFICATIONS,
   INITIAL_STUDENTS,
+  FACULTIES,
 } from "./data";
 
 import Login from "./components/Login";
@@ -48,13 +49,16 @@ export default function App() {
   const [requests, setRequests] = useState<ConsultationRequest[]>([]);
   const [availability, setAvailability] = useState<AvailabilitySlot[]>([]);
   const [isDataLoaded, setIsDataLoaded] = useState(false);
+  const [facultyPhoto, setFacultyPhoto] = useState<string | null>(null);
+  const [studentPhoto, setStudentPhoto] = useState<string | null>(null);
 
-  const [schedule] = useState(INITIAL_SCHEDULE);
+  const [schedule, setSchedule] = useState(INITIAL_SCHEDULE);
   const [facultyConversations, setFacultyConversations] = useState(INITIAL_FACULTY_CONVERSATIONS);
   const [studentConversations, setStudentConversations] = useState(INITIAL_STUDENT_CONVERSATIONS);
   const [facultyNotifications, setFacultyNotifications] = useState(INITIAL_FACULTY_NOTIFICATIONS);
   const [studentNotifications, setStudentNotifications] = useState(INITIAL_STUDENT_NOTIFICATIONS);
   const [students] = useState(INITIAL_STUDENTS);
+  const [faculties, setFaculties] = useState(FACULTIES);
   
   const [selectedFacultyConvId, setSelectedFacultyConvId] = useState<string | null>(null);
   const [selectedStudentConvId, setSelectedStudentConvId] = useState<string | null>(null);
@@ -154,6 +158,11 @@ export default function App() {
     await api.updateRequest(id, { status: "Cancelled" });
   };
 
+  const updateStudentRequest = async (id: string, updated: Partial<ConsultationRequest>) => {
+    setRequests(rs => rs.map(r => r.id === id ? { ...r, ...updated } : r));
+    await api.updateRequest(id, updated);
+  };
+
   // --- Messaging ---
   const sendFacultyMessage = (convId: string, content: string) => {
     const msg: ChatMessage = {
@@ -221,6 +230,25 @@ export default function App() {
     await api.toggleAvailability(id);
   };
 
+  // --- Schedule ---
+  const addScheduleEvent = (event: Omit<ScheduleEvent, "id">) => {
+    const newEvent = { ...event, id: `se${Date.now()}` } as ScheduleEvent;
+    setSchedule(s => [...s, newEvent]);
+  };
+
+  const updateScheduleEvent = (id: string, updated: Partial<ScheduleEvent>) => {
+    setSchedule(s => s.map(ev => ev.id === id ? { ...ev, ...updated } : ev));
+  };
+
+  const deleteScheduleEvent = (id: string) => {
+    setSchedule(s => s.filter(ev => ev.id !== id));
+  };
+
+  // --- Faculty Subjects ---
+  const updateFacultySubjects = (facultyId: string, subjects: string[]) => {
+    setFaculties(fs => fs.map(f => f.id === facultyId ? { ...f, subjectsHandled: subjects } : f));
+  };
+
   // --- Unread counts ---
   const unreadFacultyMessages = facultyConversations.reduce((sum, c) => sum + c.unread, 0);
   const unreadStudentMessages = studentConversations.reduce((sum, c) => sum + c.unread, 0);
@@ -245,13 +273,13 @@ export default function App() {
       case "faculty-dashboard":
         return <FacultyDashboard requests={requests} notifications={facultyNotifications} onNav={handleNav} onApprove={approveRequest} onDecline={declineRequest} />;
       case "faculty-schedule":
-        return <FacultySchedule schedule={schedule} />;
+        return <FacultySchedule schedule={schedule} onAddEvent={addScheduleEvent} onEditEvent={updateScheduleEvent} onDeleteEvent={deleteScheduleEvent} />;
       case "faculty-requests":
         return <FacultyRequests requests={requests} onApprove={approveRequest} onDecline={declineRequest} onInfoRequest={requestInfo} onProposeAlternative={proposeAlternative} onWaitlist={waitlistRequest} />;
       case "faculty-students":
         return <FacultyStudents students={students} />;
       case "faculty-availability":
-        return <FacultyAvailability availability={availability} onAdd={addAvailability} onDelete={deleteAvailability} onToggle={toggleAvailability} />;
+        return <FacultyAvailability availability={availability} schedule={schedule} onAdd={addAvailability} onDelete={deleteAvailability} onToggle={toggleAvailability} />;
       case "faculty-messages":
         return <FacultyMessages conversations={facultyConversations} selectedId={selectedFacultyConvId} onSelect={setSelectedFacultyConvId} onSend={sendFacultyMessage} />;
       case "faculty-history":
@@ -259,7 +287,7 @@ export default function App() {
       case "faculty-notifications":
         return <FacultyNotifications notifications={facultyNotifications} onMarkRead={markFacultyNotifRead} onMarkAllRead={markAllFacultyNotifsRead} />;
       case "faculty-profile":
-        return <FacultyProfile />;
+        return <FacultyProfile profilePhoto={facultyPhoto} onUploadPhoto={setFacultyPhoto} faculty={faculties.find(f => f.id === "f1")!} onUpdateSubjects={(subs) => updateFacultySubjects("f1", subs)} />;
       default:
         return <FacultyDashboard requests={requests} notifications={facultyNotifications} onNav={handleNav} onApprove={approveRequest} onDecline={declineRequest} />;
     }
@@ -270,15 +298,15 @@ export default function App() {
       case "student-dashboard":
         return <StudentDashboard requests={requests} notifications={studentNotifications} onNav={handleNav} />;
       case "student-request":
-        return <StudentRequestForm onSubmit={submitRequest} availability={availability} />;
+        return <StudentRequestForm onSubmit={submitRequest} availability={availability} schedule={schedule} faculties={faculties} />;
       case "student-consultations":
-        return <StudentConsultations requests={requests} onAcceptAlternative={acceptAlternative} onCancelRequest={cancelStudentRequest} onNav={handleNav} />;
+        return <StudentConsultations requests={requests} onAcceptAlternative={acceptAlternative} onCancelRequest={cancelStudentRequest} onEditRequest={updateStudentRequest} onNav={handleNav} />;
       case "student-messages":
         return <StudentMessages conversations={studentConversations} selectedId={selectedStudentConvId} onSelect={setSelectedStudentConvId} onSend={sendStudentMessage} />;
       case "student-notifications":
         return <StudentNotifications notifications={studentNotifications} onMarkRead={markStudentNotifRead} onMarkAllRead={markAllStudentNotifsRead} />;
       case "student-profile":
-        return <StudentProfile />;
+        return <StudentProfile profilePhoto={studentPhoto} onUploadPhoto={setStudentPhoto} />;
       default:
         return <StudentDashboard requests={requests} notifications={studentNotifications} onNav={handleNav} />;
     }
@@ -286,6 +314,7 @@ export default function App() {
 
   const notifications = role === "faculty" ? facultyNotifications : studentNotifications;
   const unreadMessages = role === "faculty" ? unreadFacultyMessages : unreadStudentMessages;
+  const currentPhoto = role === "faculty" ? facultyPhoto : studentPhoto;
 
   return (
     <Layout
@@ -299,6 +328,7 @@ export default function App() {
       onSearch={setSearchQuery}
       theme={theme}
       onToggleTheme={() => setTheme(t => t === "light" ? "dark" : "light")}
+      profilePhoto={currentPhoto}
     >
       {role === "faculty" ? renderFacultyView() : renderStudentView()}
     </Layout>

@@ -43,11 +43,23 @@ export type ConcernType =
 
 export type EventType = "class" | "meeting" | "blocked" | "consultation" | "availability";
 
+export interface FacultyRecord {
+  id: string;
+  name: string;
+  title: string;
+  department: string;
+  email: string;
+  initials: string;
+  subjectsHandled: string[];
+}
+
 export interface ConsultationRequest {
   id: string;
   studentId: string;
   studentName: string;
   section: string;
+  facultyId?: string;
+  facultyName?: string;
   subject: string;
   concern: ConcernType;
   description: string;

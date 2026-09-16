@@ -1,7 +1,12 @@
 import { useState } from "react";
 import { STUDENT } from "../data";
 
-export default function StudentProfile() {
+interface Props {
+  profilePhoto: string | null;
+  onUploadPhoto: (photo: string) => void;
+}
+
+export default function StudentProfile({ profilePhoto, onUploadPhoto }: Props) {
   const [editing, setEditing] = useState(false);
   const [form, setForm] = useState({
     name: STUDENT.name,
@@ -11,6 +16,16 @@ export default function StudentProfile() {
     notifyEmail: true,
     notifySystem: true,
   });
+
+  const handlePhotoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        onUploadPhoto(event.target?.result as string);
+      };
+      reader.readAsDataURL(e.target.files[0]);
+    }
+  };
 
   return (
     <div>
@@ -31,7 +46,18 @@ export default function StudentProfile() {
         {/* Profile card */}
         <div className="lg:col-span-1 space-y-4">
           <div className="card p-6 text-center">
-            <div className="w-24 h-24 rounded-full flex items-center justify-center text-white text-3xl font-bold mx-auto mb-4" style={{ background: "linear-gradient(135deg, #059669, #10b981)" }}>JD</div>
+            <div className="relative w-24 h-24 mx-auto mb-4 group">
+              <div className="w-full h-full rounded-full flex items-center justify-center text-white text-3xl font-bold overflow-hidden shadow-sm" style={{ background: "linear-gradient(135deg, #059669, #10b981)" }}>
+                {profilePhoto ? <img src={profilePhoto} alt="Profile" className="w-full h-full object-cover" /> : "JD"}
+              </div>
+              {editing && (
+                <label className="absolute inset-0 bg-black/50 rounded-full flex flex-col items-center justify-center opacity-0 group-hover:opacity-100 cursor-pointer transition-opacity fade-in text-white text-xs font-medium">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mb-1"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+                  Upload
+                  <input type="file" className="hidden" accept="image/*" onChange={handlePhotoUpload} />
+                </label>
+              )}
+            </div>
             <h2 className="font-display text-slate-900 text-xl">{STUDENT.name}</h2>
             <p className="text-slate-500 text-sm mt-1">{STUDENT.section}</p>
             <p className="text-slate-400 text-xs">{STUDENT.email}</p>
