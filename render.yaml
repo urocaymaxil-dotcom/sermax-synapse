@@ -20,12 +20,6 @@ services:
     plan: free
     buildCommand: npm install && npm run build
     staticPublishPath: dist
-    envVars:
-      - key: VITE_API_URL
-        fromService:
-          type: web
-          name: synapse-backend
-          property: url
 
 databases:
   - name: synapse-db
