@@ -4,8 +4,9 @@ import { CONCERN_TYPES, SUBJECTS, FACULTY, formatTime } from "../data";
 
 interface Props {
   availability: AvailabilitySlot[];
-  schedule?: ScheduleEvent[];
+  schedule: ScheduleEvent[];
   faculties: FacultyRecord[];
+  userName: string;
   onSubmit: (req: Omit<ConsultationRequest, "id" | "status" | "priorityScore" | "waitDays" | "displacementCount" | "createdAt">) => void;
 }
 
@@ -40,7 +41,7 @@ function checkOverlap(slotStartMin: number, slotEndMin: number, day: string, sch
 
 const DAYS = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
 
-export default function StudentRequestForm({ onSubmit, availability, schedule = [], faculties }: Props) {
+export default function StudentRequestForm({ onSubmit, availability, schedule, faculties, userName }: Props) {
   const [step, setStep] = useState(0);
   const [submitted, setSubmitted] = useState(false);
   const [searchTeacher, setSearchTeacher] = useState("");
@@ -63,7 +64,7 @@ export default function StudentRequestForm({ onSubmit, availability, schedule = 
   const handleSubmit = () => {
     onSubmit({
       studentId: "s1",
-      studentName: "Juan Dela Cruz",
+      studentName: userName,
       section: "BSCS 2A",
       facultyId: form.facultyId,
       facultyName: form.facultyName,

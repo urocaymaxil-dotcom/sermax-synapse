@@ -8,7 +8,9 @@ interface Props {
   onNav: (v: string) => void;
   onApprove: (id: string) => void;
   onDecline: (id: string) => void;
+  userName: string;
 }
+
 
 function MiniCalendar() {
   const today = new Date(2026, 8, 15); // Sep 15, 2026
@@ -63,7 +65,7 @@ function MiniCalendar() {
   );
 }
 
-export default function FacultyDashboard({ requests, notifications, onNav, onApprove, onDecline }: Props) {
+export default function FacultyDashboard({ requests, notifications, onNav, onApprove, onDecline, userName }: Props) {
   const pending = requests.filter(r => r.status === "Pending");
   const upcoming = requests.filter(r => ["Confirmed", "Approved"].includes(r.status));
   const waitlisted = requests.filter(r => r.status === "Waitlisted");
@@ -81,7 +83,7 @@ export default function FacultyDashboard({ requests, notifications, onNav, onApp
       {/* Header */}
       <div className="flex items-start justify-between mb-6">
         <div>
-          <h1 className="font-display text-slate-900 text-2xl">Good morning, Dr. Santos!</h1>
+          <h1 className="font-display text-slate-900 text-2xl">Good morning, {userName}!</h1>
           <p className="text-slate-500 text-sm mt-1">Here's an overview of your consultations and requests for today.</p>
           <div className="mt-3 inline-block px-3 py-1.5 rounded-md" style={{ background: "rgba(29,78,216,0.06)", border: "1px solid rgba(29,78,216,0.15)" }}>
             <p className="text-xs text-blue-800 font-medium tracking-wide">

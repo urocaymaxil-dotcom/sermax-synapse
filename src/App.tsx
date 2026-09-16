@@ -34,6 +34,7 @@ import StudentProfile from "./student/StudentProfile";
 export default function App() {
   const [view, setView] = useState<ViewType>("login");
   const [role, setRole] = useState<"faculty" | "student" | null>(null);
+  const [currentUser, setCurrentUser] = useState<{name: string, email: string} | null>(null);
   const [theme, setTheme] = useState<"light" | "dark">("light");
   
   // Apply theme to body/html
@@ -86,13 +87,15 @@ export default function App() {
     }
   };
 
-  const handleLogin = (r: "faculty" | "student") => {
+  const handleLogin = (r: "faculty" | "student", user: {name: string, email: string}) => {
     setRole(r);
+    setCurrentUser(user);
     setView(r === "faculty" ? "faculty-dashboard" : "student-dashboard");
   };
 
   const handleLogout = () => {
     setRole(null);
+    setCurrentUser(null);
     setView("login");
     setSearchQuery("");
     setIsDataLoaded(false);
@@ -268,7 +271,7 @@ export default function App() {
   const renderFacultyView = () => {
     switch (view) {
       case "faculty-dashboard":
-        return <FacultyDashboard requests={requests} notifications={facultyNotifications} onNav={handleNav} onApprove={approveRequest} onDecline={declineRequest} />;
+        return <FacultyDashboard requests={requests} notifications={facultyNotifications} onNav={handleNav} onApprove={approveRequest} onDecline={declineRequest} userName={currentUser?.name || ""} />;
       case "faculty-schedule":
         return <FacultySchedule schedule={schedule} onAddEvent={addScheduleEvent} onEditEvent={updateScheduleEvent} onDeleteEvent={deleteScheduleEvent} />;
       case "faculty-requests":
@@ -286,16 +289,16 @@ export default function App() {
       case "faculty-profile":
         return <FacultyProfile profilePhoto={facultyPhoto} onUploadPhoto={setFacultyPhoto} faculty={faculties.find(f => f.id === "f1")!} onUpdateSubjects={(subs) => updateFacultySubjects("f1", subs)} />;
       default:
-        return <FacultyDashboard requests={requests} notifications={facultyNotifications} onNav={handleNav} onApprove={approveRequest} onDecline={declineRequest} />;
+        return <FacultyDashboard requests={requests} notifications={facultyNotifications} onNav={handleNav} onApprove={approveRequest} onDecline={declineRequest} userName={currentUser?.name || ""} />;
     }
   };
 
   const renderStudentView = () => {
     switch (view) {
       case "student-dashboard":
-        return <StudentDashboard requests={requests} notifications={studentNotifications} onNav={handleNav} />;
+        return <StudentDashboard requests={requests} notifications={studentNotifications} onNav={handleNav} userName={currentUser?.name || ""} />;
       case "student-request":
-        return <StudentRequestForm onSubmit={submitRequest} availability={availability} schedule={schedule} faculties={faculties} />;
+        return <StudentRequestForm onSubmit={submitRequest} availability={availability} schedule={schedule} faculties={faculties} userName={currentUser?.name || ""} />;
       case "student-consultations":
         return <StudentConsultations requests={requests} onAcceptAlternative={acceptAlternative} onCancelRequest={cancelStudentRequest} onEditRequest={updateStudentRequest} onNav={handleNav} />;
       case "student-messages":
@@ -305,7 +308,7 @@ export default function App() {
       case "student-profile":
         return <StudentProfile profilePhoto={studentPhoto} onUploadPhoto={setStudentPhoto} />;
       default:
-        return <StudentDashboard requests={requests} notifications={studentNotifications} onNav={handleNav} />;
+        return <StudentDashboard requests={requests} notifications={studentNotifications} onNav={handleNav} userName={currentUser?.name || ""} />;
     }
   };
 
@@ -326,6 +329,7 @@ export default function App() {
       theme={theme}
       onToggleTheme={() => setTheme(t => t === "light" ? "dark" : "light")}
       profilePhoto={currentPhoto}
+      userName={currentUser?.name || ""}
     >
       {role === "faculty" ? renderFacultyView() : renderStudentView()}
     </Layout>

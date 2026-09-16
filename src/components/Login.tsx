@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import logo from "@/imports/ChatGPT_Image_Sep_16__2026__02_42_11_AM-removebg-preview.png";
 
 interface LoginProps {
-  onLogin: (role: "faculty" | "student") => void;
+  onLogin: (role: "faculty" | "student", user: {name: string, email: string}) => void;
 }
 
 export default function Login({ onLogin }: LoginProps) {
@@ -64,12 +64,12 @@ export default function Login({ onLogin }: LoginProps) {
         users.push(newUser);
         localStorage.setItem("sermax_users", JSON.stringify(users));
         
-        onLogin(role);
+        onLogin(role, { name, email });
       } else {
         // Sign In Logic
         const user = users.find((u: any) => u.email === email && u.password === password);
         if (user) {
-          onLogin(user.role);
+          onLogin(user.role, { name: user.name, email: user.email });
         } else {
           setError("Invalid email or password.");
         }

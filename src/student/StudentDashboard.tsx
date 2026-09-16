@@ -5,11 +5,12 @@ interface Props {
   requests: ConsultationRequest[];
   notifications: AppNotification[];
   onNav: (v: string) => void;
+  userName: string;
 }
 
 const MY_STUDENT_ID = "s1";
 
-export default function StudentDashboard({ requests, notifications, onNav }: Props) {
+export default function StudentDashboard({ requests, notifications, onNav, userName }: Props) {
   const myRequests = requests.filter(r => r.studentId === MY_STUDENT_ID);
   const pending = myRequests.filter(r => ["Pending","Waitlisted"].includes(r.status));
   const upcoming = myRequests.filter(r => ["Confirmed","Approved"].includes(r.status));
@@ -24,7 +25,7 @@ export default function StudentDashboard({ requests, notifications, onNav }: Pro
       {/* Header */}
       <div className="flex items-start justify-between mb-6 flex-wrap gap-4">
         <div>
-          <h1 className="font-display text-slate-900 text-2xl">Good morning, Juan!</h1>
+          <h1 className="font-display text-slate-900 text-2xl">Good morning, {userName ? userName.split(' ')[0] : 'Student'}!</h1>
           <p className="text-slate-500 text-sm mt-1">Here's an overview of your consultations with Dr. Santos.</p>
           <div className="mt-3 inline-block px-3 py-1.5 rounded-md" style={{ background: "rgba(5,150,105,0.06)", border: "1px solid rgba(5,150,105,0.15)" }}>
             <p className="text-xs text-emerald-800 font-medium tracking-wide">

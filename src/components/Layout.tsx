@@ -152,6 +152,7 @@ interface TopBarProps {
   searchQuery: string;
   onSearch: (q: string) => void;
   profilePhoto: string | null;
+  userName: string;
 }
 
 const VIEW_TITLES: Record<string, string> = {
@@ -172,10 +173,10 @@ const VIEW_TITLES: Record<string, string> = {
   "student-profile": "Profile",
 };
 
-function TopBar({ role, view, notifications, unreadNotif, onNav, searchQuery, onSearch, profilePhoto }: TopBarProps) {
-  const name = role === "faculty" ? "Dr. Maria Santos" : "Juan Dela Cruz";
+function TopBar({ role, view, notifications, unreadNotif, onNav, searchQuery, onSearch, profilePhoto, userName }: TopBarProps) {
+  const name = userName;
   const title = role === "faculty" ? "Faculty Member" : "BSCS 2A";
-  const initials = role === "faculty" ? "MS" : "JD";
+  const initials = userName ? userName.split(" ").map(n => n[0]).join("").substring(0, 2).toUpperCase() : (role === "faculty" ? "MS" : "JD");
   const profileView: ViewType = role === "faculty" ? "faculty-profile" : "student-profile";
   const notifView: ViewType = role === "faculty" ? "faculty-notifications" : "student-notifications";
 
@@ -246,9 +247,10 @@ interface LayoutProps {
   theme: "light" | "dark";
   onToggleTheme: () => void;
   profilePhoto: string | null;
+  userName: string;
 }
 
-export default function Layout({ role, view, onNav, notifications, unreadMessages, onLogout, children, searchQuery, onSearch, theme, onToggleTheme, profilePhoto }: LayoutProps) {
+export default function Layout({ role, view, onNav, notifications, unreadMessages, onLogout, children, searchQuery, onSearch, theme, onToggleTheme, profilePhoto, userName }: LayoutProps) {
   const unreadNotif = notifications.filter((n) => !n.read).length;
 
   return (
@@ -257,7 +259,7 @@ export default function Layout({ role, view, onNav, notifications, unreadMessage
         <Sidebar role={role} view={view} onNav={onNav} notifications={notifications} unreadMessages={unreadMessages} onLogout={onLogout} theme={theme} onToggleTheme={onToggleTheme} />
       </div>
       <div className="flex-1 flex flex-col overflow-hidden min-w-0">
-        <TopBar role={role} view={view} notifications={notifications} unreadNotif={unreadNotif} onNav={onNav} searchQuery={searchQuery} onSearch={onSearch} profilePhoto={profilePhoto} />
+        <TopBar role={role} view={view} notifications={notifications} unreadNotif={unreadNotif} onNav={onNav} searchQuery={searchQuery} onSearch={onSearch} profilePhoto={profilePhoto} userName={userName} />
         <main className="flex-1 overflow-y-auto p-6 fade-in">
           {children}
         </main>
