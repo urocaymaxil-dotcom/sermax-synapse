@@ -34,7 +34,7 @@ export default function StudentConsultations({ requests, onAcceptAlternative, on
     <div>
       <div className="flex items-start justify-between mb-6 flex-wrap gap-4">
         <div>
-          <h1 className="font-display font-bold text-2xl text-slate-900">My Consultations</h1>
+          <h1 className="font-display text-2xl text-slate-900">My Consultations</h1>
           <p className="text-slate-500 text-sm mt-1">{myRequests.length} total request{myRequests.length !== 1 ? "s" : ""} across all semesters</p>
         </div>
         <button onClick={() => onNav("student-request")} className="flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium text-white hover:opacity-90 transition-all" style={{ background: "linear-gradient(135deg, #1d4ed8, #059669)" }}>
@@ -68,7 +68,7 @@ export default function StudentConsultations({ requests, onAcceptAlternative, on
               <div className="flex items-start justify-between gap-4 flex-wrap mb-3">
                 <div>
                   <div className="flex items-center gap-2 flex-wrap mb-1">
-                    <span className="font-display font-semibold text-slate-800">{req.subject}</span>
+                    <span className="font-heading text-slate-800">{req.subject}</span>
                     <span className={`text-xs px-2.5 py-0.5 rounded-full font-semibold ${getStatusClass(req.status)}`}>{req.status}</span>
                     <span className="text-xs px-2 py-0.5 rounded-full" style={{ background: req.mode === "Online" ? "#dbeafe" : "#d1fae5", color: req.mode === "Online" ? "#1e40af" : "#065f46" }}>{req.mode}</span>
                   </div>

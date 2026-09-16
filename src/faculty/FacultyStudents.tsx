@@ -22,7 +22,7 @@ export default function FacultyStudents({ students }: Props) {
     <div>
       <div className="flex items-start justify-between mb-6 flex-wrap gap-4">
         <div>
-          <h1 className="font-display font-bold text-2xl text-slate-900">My Students</h1>
+          <h1 className="font-display text-2xl text-slate-900">My Students</h1>
           <p className="text-slate-500 text-sm mt-1">{students.length} students across your subjects</p>
         </div>
       </div>
@@ -36,7 +36,7 @@ export default function FacultyStudents({ students }: Props) {
           { label: "Avg. Consultations", value: (students.reduce((s, st) => s + st.totalConsultations, 0) / students.length).toFixed(1), color: "#7c3aed" },
         ].map(s => (
           <div key={s.label} className="card p-4">
-            <div className="text-2xl font-display font-bold" style={{ color: s.color }}>{s.value}</div>
+            <div className="text-2xl font-display" style={{ color: s.color }}>{s.value}</div>
             <div className="text-xs text-slate-500 mt-1">{s.label}</div>
           </div>
         ))}
@@ -70,7 +70,7 @@ export default function FacultyStudents({ students }: Props) {
                 {student.name.split(" ").map(n => n[0]).join("").slice(0, 2)}
               </div>
               <div className="flex-1 min-w-0">
-                <div className="font-display font-semibold text-slate-800 text-sm">{student.name}</div>
+                <div className="font-heading text-slate-800 text-sm">{student.name}</div>
                 <div className="text-xs text-slate-400">{student.section}</div>
                 <div className="text-xs text-slate-400 truncate">{student.email}</div>
               </div>

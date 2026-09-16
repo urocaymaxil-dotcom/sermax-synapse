@@ -22,7 +22,7 @@ export default function FacultyMessages({ conversations, selectedId, onSelect, o
   return (
     <div>
       <div className="mb-6">
-        <h1 className="font-display font-bold text-2xl text-slate-900">Messages</h1>
+        <h1 className="font-display text-2xl text-slate-900">Messages</h1>
         <p className="text-slate-500 text-sm mt-1">Communication within consultation requests</p>
       </div>
 
@@ -68,7 +68,7 @@ export default function FacultyMessages({ conversations, selectedId, onSelect, o
                 {selected.participantName.split(" ").map(n => n[0]).join("").slice(0, 2)}
               </div>
               <div>
-                <div className="font-display font-semibold text-slate-800 text-sm">{selected.participantName}</div>
+                <div className="font-heading text-slate-800 text-sm">{selected.participantName}</div>
                 <div className="text-xs text-slate-400">{selected.subject}</div>
               </div>
             </div>

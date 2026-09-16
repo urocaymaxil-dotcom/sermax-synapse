@@ -16,7 +16,7 @@ export default function StudentProfile() {
     <div>
       <div className="flex items-start justify-between mb-6 flex-wrap gap-4">
         <div>
-          <h1 className="font-display font-bold text-2xl text-slate-900">My Profile</h1>
+          <h1 className="font-display text-2xl text-slate-900">My Profile</h1>
           <p className="text-slate-500 text-sm mt-1">Manage your account information and preferences</p>
         </div>
         <button onClick={() => setEditing(!editing)} className="flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium transition-all" style={{ background: editing ? "#e2e8f0" : "#d1fae5", color: editing ? "#475569" : "#059669", border: "1px solid " + (editing ? "#cbd5e1" : "#6ee7b7") }}>
@@ -32,7 +32,7 @@ export default function StudentProfile() {
         <div className="lg:col-span-1 space-y-4">
           <div className="card p-6 text-center">
             <div className="w-24 h-24 rounded-full flex items-center justify-center text-white text-3xl font-bold mx-auto mb-4" style={{ background: "linear-gradient(135deg, #059669, #10b981)" }}>JD</div>
-            <h2 className="font-display font-bold text-slate-900 text-xl">{STUDENT.name}</h2>
+            <h2 className="font-display text-slate-900 text-xl">{STUDENT.name}</h2>
             <p className="text-slate-500 text-sm mt-1">{STUDENT.section}</p>
             <p className="text-slate-400 text-xs">{STUDENT.email}</p>
 
@@ -52,7 +52,7 @@ export default function StudentProfile() {
           </div>
 
           <div className="card p-5">
-            <h3 className="font-display font-semibold text-slate-700 text-sm mb-3">Consultation Summary</h3>
+            <h3 className="font-heading text-slate-700 text-sm mb-3">Consultation Summary</h3>
             <div className="space-y-2">
               {[
                 { label: "Total Requests", value: "1" },
@@ -72,7 +72,7 @@ export default function StudentProfile() {
         {/* Settings */}
         <div className="lg:col-span-2 space-y-5">
           <div className="card p-5">
-            <h3 className="font-display font-semibold text-slate-800 mb-4">Personal Information</h3>
+            <h3 className="font-heading text-slate-800 mb-4">Personal Information</h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {[
                 { label: "Full Name", key: "name", type: "text" },
@@ -96,7 +96,7 @@ export default function StudentProfile() {
           </div>
 
           <div className="card p-5">
-            <h3 className="font-display font-semibold text-slate-800 mb-4">Notification Preferences</h3>
+            <h3 className="font-heading text-slate-800 mb-4">Notification Preferences</h3>
             <div className="space-y-3">
               {[
                 { label: "Email Notifications", sub: "Receive email alerts when request status changes", key: "notifyEmail" },

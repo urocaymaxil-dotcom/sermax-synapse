@@ -19,7 +19,7 @@ export default function FacultyProfile() {
     <div>
       <div className="flex items-start justify-between mb-6 flex-wrap gap-4">
         <div>
-          <h1 className="font-display font-bold text-2xl text-slate-900">Profile & Settings</h1>
+          <h1 className="font-display text-2xl text-slate-900">Profile & Settings</h1>
           <p className="text-slate-500 text-sm mt-1">Manage your account and consultation preferences</p>
         </div>
         <button onClick={() => setEditing(!editing)} className="flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium transition-all" style={{ background: editing ? "#e2e8f0" : "#dbeafe", color: editing ? "#475569" : "#1d4ed8", border: "1px solid " + (editing ? "#cbd5e1" : "#bfdbfe") }}>
@@ -37,7 +37,7 @@ export default function FacultyProfile() {
             <div className="w-24 h-24 rounded-full flex items-center justify-center text-white text-3xl font-bold mx-auto mb-4" style={{ background: "linear-gradient(135deg, #1d4ed8, #059669)" }}>
               MS
             </div>
-            <h2 className="font-display font-bold text-slate-900 text-xl">{FACULTY.name}</h2>
+            <h2 className="font-display text-slate-900 text-xl">{FACULTY.name}</h2>
             <p className="text-slate-500 text-sm mt-1">{FACULTY.title}</p>
             <p className="text-slate-400 text-xs mt-0.5">{FACULTY.department}</p>
             <p className="text-slate-400 text-xs">{FACULTY.email}</p>
@@ -59,7 +59,7 @@ export default function FacultyProfile() {
 
           {/* Quick stats */}
           <div className="card p-5">
-            <h3 className="font-display font-semibold text-slate-700 text-sm mb-3">This Semester</h3>
+            <h3 className="font-heading text-slate-700 text-sm mb-3">This Semester</h3>
             <div className="space-y-2">
               {[
                 { label: "Total Requests", value: "10" },
@@ -80,7 +80,7 @@ export default function FacultyProfile() {
         <div className="lg:col-span-2 space-y-5">
           {/* Personal info */}
           <div className="card p-5">
-            <h3 className="font-display font-semibold text-slate-800 mb-4">Personal Information</h3>
+            <h3 className="font-heading text-slate-800 mb-4">Personal Information</h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {[
                 { label: "Full Name", key: "name", type: "text" },
@@ -104,7 +104,7 @@ export default function FacultyProfile() {
 
           {/* Consultation preferences */}
           <div className="card p-5">
-            <h3 className="font-display font-semibold text-slate-800 mb-4">Consultation Preferences</h3>
+            <h3 className="font-heading text-slate-800 mb-4">Consultation Preferences</h3>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
               {[
                 { label: "Buffer Between Consultations (min)", key: "consultationBuffer", type: "number" },

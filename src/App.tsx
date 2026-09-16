@@ -33,6 +33,16 @@ import StudentProfile from "./student/StudentProfile";
 export default function App() {
   const [view, setView] = useState<ViewType>("login");
   const [role, setRole] = useState<"faculty" | "student" | null>(null);
+  const [theme, setTheme] = useState<"light" | "dark">("light");
+  
+  // Apply theme to body/html
+  useEffect(() => {
+    if (theme === "dark") {
+      document.documentElement.classList.add("dark");
+    } else {
+      document.documentElement.classList.remove("dark");
+    }
+  }, [theme]);
   
   // Backend State
   const [requests, setRequests] = useState<ConsultationRequest[]>([]);
@@ -260,7 +270,7 @@ export default function App() {
       case "student-dashboard":
         return <StudentDashboard requests={requests} notifications={studentNotifications} onNav={handleNav} />;
       case "student-request":
-        return <StudentRequestForm onSubmit={submitRequest} />;
+        return <StudentRequestForm onSubmit={submitRequest} availability={availability} />;
       case "student-consultations":
         return <StudentConsultations requests={requests} onAcceptAlternative={acceptAlternative} onCancelRequest={cancelStudentRequest} onNav={handleNav} />;
       case "student-messages":
@@ -287,6 +297,8 @@ export default function App() {
       onLogout={handleLogout}
       searchQuery={searchQuery}
       onSearch={setSearchQuery}
+      theme={theme}
+      onToggleTheme={() => setTheme(t => t === "light" ? "dark" : "light")}
     >
       {role === "faculty" ? renderFacultyView() : renderStudentView()}
     </Layout>

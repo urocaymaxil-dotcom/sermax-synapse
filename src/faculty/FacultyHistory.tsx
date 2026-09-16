@@ -28,7 +28,7 @@ export default function FacultyHistory({ requests, onRecordOutcome }: Props) {
     <div>
       <div className="flex items-start justify-between mb-6 flex-wrap gap-4">
         <div>
-          <h1 className="font-display font-bold text-2xl text-slate-900">Consultation History</h1>
+          <h1 className="font-display text-2xl text-slate-900">Consultation History</h1>
           <p className="text-slate-500 text-sm mt-1">{completed.length} completed consultations this semester</p>
         </div>
       </div>
@@ -42,7 +42,7 @@ export default function FacultyHistory({ requests, onRecordOutcome }: Props) {
           { label: "Needs Outcome", value: needsOutcome.length, color: "#d97706", bg: "#fef3c7" },
         ].map(s => (
           <div key={s.label} className="card p-4">
-            <div className="text-2xl font-display font-bold" style={{ color: s.color }}>{s.value}</div>
+            <div className="text-2xl font-display" style={{ color: s.color }}>{s.value}</div>
             <div className="text-xs text-slate-500 mt-1">{s.label}</div>
           </div>
         ))}

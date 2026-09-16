@@ -13,6 +13,7 @@ export default function Login({ onLogin }: LoginProps) {
   const [role, setRole] = useState<"faculty" | "student">("student");
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [isLogoZoomed, setIsLogoZoomed] = useState(false);
 
   // Initialize demo accounts if empty
   useEffect(() => {
@@ -85,15 +86,49 @@ export default function Login({ onLogin }: LoginProps) {
         <div style={{ position: "absolute", bottom: "-10%", right: "-10%", width: 520, height: 520, borderRadius: "50%", background: "rgba(5,150,105,0.15)", filter: "blur(80px)" }} />
         <div style={{ position: "absolute", top: "40%", left: "50%", transform: "translate(-50%,-50%)", width: 300, height: 300, borderRadius: "50%", background: "rgba(99,102,241,0.08)", filter: "blur(60px)" }} />
       </div>
+      
+      {/* Logo Zoom Overlay */}
+      {isLogoZoomed && (
+        <div 
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/90 backdrop-blur-sm fade-in"
+          onClick={() => setIsLogoZoomed(false)}
+        >
+          <div className="relative max-w-4xl max-h-screen p-4 flex flex-col items-center">
+            <button 
+              className="absolute top-0 right-0 m-4 w-10 h-10 bg-white/10 hover:bg-white/20 rounded-full flex items-center justify-center text-white transition-colors"
+              onClick={() => setIsLogoZoomed(false)}
+            >
+              ✕
+            </button>
+            <div className="bg-white rounded-full p-8 shadow-[0_0_80px_rgba(255,255,255,0.2)]">
+              <img 
+                src={logo} 
+                alt="SerMax SYNAPSE Logo Enlarged" 
+                className="w-[300px] h-[300px] md:w-[500px] md:h-[500px] object-contain transition-transform duration-300 hover:scale-105" 
+                onClick={(e) => e.stopPropagation()}
+              />
+            </div>
+            <div className="mt-8 text-center" onClick={(e) => e.stopPropagation()}>
+              <div className="font-logo text-white text-3xl md:text-5xl" style={{ letterSpacing: -0.5 }}>
+                <span style={{ color: "#dbeafe" }}>SERMAX</span>{" "}
+                <span style={{ color: "#6ee7b7" }}>SYNAPSE</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
 
       <div className="relative z-10 flex flex-col items-center w-full max-w-md px-4">
         {/* Logo Header */}
-        <div className="mb-6 flex flex-col items-center">
-          <div className="bg-white rounded-full p-4 mb-3 shadow-2xl flex items-center justify-center transition-all duration-300 hover:scale-105 hover:shadow-[0_0_40px_rgba(255,255,255,0.3)]" style={{ width: 120, height: 120 }}>
+        <div className="mb-6 flex flex-col items-center group cursor-pointer" onClick={() => setIsLogoZoomed(true)}>
+          <div className="bg-white rounded-full p-4 mb-3 shadow-2xl flex items-center justify-center transition-all duration-300 group-hover:scale-105 group-hover:shadow-[0_0_40px_rgba(255,255,255,0.3)] relative" style={{ width: 120, height: 120 }}>
             <img src={logo} alt="SerMax SYNAPSE" style={{ width: "100%", height: "100%", objectFit: "contain" }} />
+            <div className="absolute inset-0 bg-black/40 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/><line x1="11" y1="8" x2="11" y2="14"/><line x1="8" y1="11" x2="14" y2="11"/></svg>
+            </div>
           </div>
           <div className="text-center">
-            <div className="font-display font-bold text-white" style={{ fontSize: 24, letterSpacing: -0.5 }}>
+            <div className="font-logo text-white transition-all group-hover:text-blue-100" style={{ fontSize: 24, letterSpacing: -0.5 }}>
               <span style={{ color: "#dbeafe" }}>SERMAX</span>{" "}
               <span style={{ color: "#6ee7b7" }}>SYNAPSE</span>
             </div>
@@ -102,7 +137,7 @@ export default function Login({ onLogin }: LoginProps) {
 
         {/* Authentication Card */}
         <div className="w-full rounded-2xl p-8" style={{ background: "rgba(255,255,255,0.07)", backdropFilter: "blur(20px)", border: "1px solid rgba(255,255,255,0.12)" }}>
-          <h2 className="text-white font-display font-semibold text-2xl mb-1 text-center">
+          <h2 className="text-white font-heading text-2xl mb-1 text-center">
             {isLogin ? "Welcome Back" : "Create Account"}
           </h2>
           <p className="text-white/50 text-sm text-center mb-6">

@@ -24,7 +24,7 @@ export default function StudentDashboard({ requests, notifications, onNav }: Pro
       {/* Header */}
       <div className="flex items-start justify-between mb-6 flex-wrap gap-4">
         <div>
-          <h1 className="font-display font-bold text-slate-900 text-2xl">Good morning, Juan!</h1>
+          <h1 className="font-display text-slate-900 text-2xl">Good morning, Juan!</h1>
           <p className="text-slate-500 text-sm mt-1">Here's an overview of your consultations with Dr. Santos.</p>
           <div className="mt-3 inline-block px-3 py-1.5 rounded-md" style={{ background: "rgba(5,150,105,0.06)", border: "1px solid rgba(5,150,105,0.15)" }}>
             <p className="text-xs text-emerald-800 font-medium tracking-wide">
@@ -58,7 +58,7 @@ export default function StudentDashboard({ requests, notifications, onNav }: Pro
                 <path d="M5 12h14M12 5l7 7-7 7" />
               </svg>
             </div>
-            <div className="text-3xl font-display font-bold text-slate-800">{s.value}</div>
+            <div className="text-3xl font-display text-slate-800">{s.value}</div>
             <div className="text-sm text-slate-600 mt-0.5">{s.label}</div>
           </button>
         ))}
@@ -70,7 +70,7 @@ export default function StudentDashboard({ requests, notifications, onNav }: Pro
           {/* Upcoming */}
           <div className="card p-5">
             <div className="flex items-center justify-between mb-4">
-              <h2 className="font-display font-semibold text-slate-800">My Consultation Requests</h2>
+              <h2 className="font-heading text-slate-800">My Consultation Requests</h2>
               <button onClick={() => onNav("student-consultations")} className="text-xs text-blue-600 hover:text-blue-800 font-medium">View All →</button>
             </div>
             {myRequests.length === 0 ? (
@@ -108,7 +108,7 @@ export default function StudentDashboard({ requests, notifications, onNav }: Pro
 
           {/* Quick actions */}
           <div className="card p-5">
-            <h2 className="font-display font-semibold text-slate-800 mb-4">Quick Actions</h2>
+            <h2 className="font-heading text-slate-800 mb-4">Quick Actions</h2>
             <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
               {[
                 { label: "New Consultation Request", icon: "M12 5v14M5 12h14", nav: "student-request", color: "#1d4ed8", bg: "#dbeafe" },
@@ -132,11 +132,11 @@ export default function StudentDashboard({ requests, notifications, onNav }: Pro
         <div className="space-y-4">
           {/* Faculty card */}
           <div className="card p-5">
-            <h3 className="font-display font-semibold text-slate-700 text-sm mb-4">My Faculty Adviser</h3>
+            <h3 className="font-heading text-slate-700 text-sm mb-4">My Faculty Adviser</h3>
             <div className="flex items-center gap-3 mb-4">
               <div className="w-12 h-12 rounded-full flex items-center justify-center text-white font-bold text-base" style={{ background: "linear-gradient(135deg, #1d4ed8, #059669)" }}>MS</div>
               <div>
-                <div className="font-display font-semibold text-slate-800">{FACULTY.name}</div>
+                <div className="font-heading text-slate-800">{FACULTY.name}</div>
                 <div className="text-xs text-slate-400">{FACULTY.title}</div>
                 <div className="text-xs text-slate-400">{FACULTY.email}</div>
               </div>
@@ -162,7 +162,7 @@ export default function StudentDashboard({ requests, notifications, onNav }: Pro
           {/* Recent notifications */}
           <div className="card p-5">
             <div className="flex items-center justify-between mb-3">
-              <h3 className="font-display font-semibold text-slate-700 text-sm">Recent Notifications</h3>
+              <h3 className="font-heading text-slate-700 text-sm">Recent Notifications</h3>
               <button onClick={() => onNav("student-notifications")} className="text-xs text-blue-600 font-medium">View All</button>
             </div>
             <div className="space-y-3">

@@ -22,14 +22,14 @@ export default function StudentMessages({ conversations, selectedId, onSelect, o
   return (
     <div>
       <div className="mb-6">
-        <h1 className="font-display font-bold text-2xl text-slate-900">Messages</h1>
+        <h1 className="font-display text-2xl text-slate-900">Messages</h1>
         <p className="text-slate-500 text-sm mt-1">Communication with Dr. Maria Santos</p>
       </div>
 
       <div className="card overflow-hidden" style={{ height: 600, display: "flex" }}>
         {/* Conversation list */}
         <div className="flex flex-col" style={{ width: 260, borderRight: "1px solid #f1f5f9", flexShrink: 0 }}>
-          <div className="p-3 font-display font-semibold text-sm text-slate-600" style={{ borderBottom: "1px solid #f1f5f9" }}>
+          <div className="p-3 font-heading text-sm text-slate-600" style={{ borderBottom: "1px solid #f1f5f9" }}>
             Conversations
           </div>
           <div className="overflow-y-auto flex-1">
@@ -62,7 +62,7 @@ export default function StudentMessages({ conversations, selectedId, onSelect, o
             <div className="p-4 flex items-center gap-3" style={{ borderBottom: "1px solid #f1f5f9" }}>
               <div className="w-9 h-9 rounded-full flex items-center justify-center text-white text-sm font-bold" style={{ background: "linear-gradient(135deg, #1d4ed8, #059669)" }}>MS</div>
               <div>
-                <div className="font-display font-semibold text-slate-800 text-sm">{selected.participantName}</div>
+                <div className="font-heading text-slate-800 text-sm">{selected.participantName}</div>
                 <div className="text-xs text-slate-400">{selected.subject}</div>
               </div>
             </div>

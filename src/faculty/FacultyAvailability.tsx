@@ -37,7 +37,7 @@ export default function FacultyAvailability({ availability, onAdd, onDelete, onT
     <div>
       <div className="flex items-start justify-between mb-6 flex-wrap gap-4">
         <div>
-          <h1 className="font-display font-bold text-2xl text-slate-900">Availability Management</h1>
+          <h1 className="font-display text-2xl text-slate-900">Availability Management</h1>
           <p className="text-slate-500 text-sm mt-1">
             Define when you are available for student consultations. Unoccupied calendar time is <em>not</em> automatically considered available.
           </p>
@@ -57,7 +57,7 @@ export default function FacultyAvailability({ availability, onAdd, onDelete, onT
           { label: "Active Days", value: DAYS.filter(d => byDay[d]?.some(s => s.type === "available")).length, color: "#7c3aed", bg: "#ede9fe" },
         ].map(s => (
           <div key={s.label} className="card p-4">
-            <div className="text-2xl font-display font-bold" style={{ color: s.color }}>{s.value}</div>
+            <div className="text-2xl font-display" style={{ color: s.color }}>{s.value}</div>
             <div className="text-xs text-slate-500 mt-1">{s.label}</div>
           </div>
         ))}
@@ -66,7 +66,7 @@ export default function FacultyAvailability({ availability, onAdd, onDelete, onT
       {/* Add slot form */}
       {showForm && (
         <div className="card p-5 mb-6" style={{ border: "2px solid #dbeafe" }}>
-          <h3 className="font-display font-semibold text-slate-800 mb-4">Add Availability Slot</h3>
+          <h3 className="font-heading text-slate-800 mb-4">Add Availability Slot</h3>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
             <div>
               <label className="text-xs text-slate-500 font-medium mb-1 block">Day</label>
@@ -106,7 +106,7 @@ export default function FacultyAvailability({ availability, onAdd, onDelete, onT
         {DAYS.map(day => (
           <div key={day} className="card p-4">
             <div className="flex items-center justify-between mb-3">
-              <h3 className="font-display font-semibold text-slate-700">{day}</h3>
+              <h3 className="font-heading text-slate-700">{day}</h3>
               <span className="text-xs text-slate-400">{byDay[day]?.length || 0} slot{byDay[day]?.length !== 1 ? "s" : ""}</span>
             </div>
 

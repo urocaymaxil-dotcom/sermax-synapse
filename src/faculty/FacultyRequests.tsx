@@ -58,7 +58,7 @@ function RequestCard({
           <div className="flex-1 min-w-0">
             <div className="flex items-start justify-between gap-2 flex-wrap">
               <div>
-                <span className="font-display font-semibold text-slate-800">{req.studentName}</span>
+                <span className="font-heading text-slate-800">{req.studentName}</span>
                 <span className="text-slate-400 text-sm ml-2">({req.section})</span>
               </div>
               <div className="flex items-center gap-2 flex-wrap">
@@ -219,7 +219,7 @@ export default function FacultyRequests({ requests, onApprove, onDecline, onInfo
     <div>
       <div className="flex items-start justify-between mb-6 flex-wrap gap-4">
         <div>
-          <h1 className="font-display font-bold text-2xl text-slate-900">Consultation Requests</h1>
+          <h1 className="font-display text-2xl text-slate-900">Consultation Requests</h1>
           <p className="text-slate-500 text-sm mt-1">
             {pending} pending · {waitlisted} waitlisted · Sorted by priority queue score
           </p>
@@ -240,7 +240,7 @@ export default function FacultyRequests({ requests, onApprove, onDecline, onInfo
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#059669" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
             <line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/>
           </svg>
-          <h3 className="font-display font-semibold text-slate-700 text-sm">Processing Queue (Prelim Implementation)</h3>
+          <h3 className="font-heading text-slate-700 text-sm">Processing Queue (Prelim Implementation)</h3>
           <span className="text-xs text-slate-400 ml-1">Strict First-In, First-Out (FIFO) Order</span>
         </div>
         <div className="flex gap-2 overflow-x-auto pb-2">
@@ -263,14 +263,14 @@ export default function FacultyRequests({ requests, onApprove, onDecline, onInfo
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#1d4ed8" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
             <path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"/>
           </svg>
-          <h3 className="font-display font-semibold text-slate-700 text-sm">Priority Queue — Fairness-Aware Ranking</h3>
+          <h3 className="font-heading text-slate-700 text-sm">Priority Queue — Fairness-Aware Ranking</h3>
           <span className="text-xs text-slate-400 ml-1">(Wait time + Deadline proximity + Displacement count + Aging)</span>
         </div>
         <div className="flex gap-2 overflow-x-auto pb-2">
           {requests.filter(r => ["Pending","Waitlisted"].includes(r.status)).sort((a,b) => b.priorityScore - a.priorityScore).slice(0,6).map((r, i) => (
             <div key={r.id} className="flex-shrink-0 rounded-lg p-3 text-center" style={{ background: i === 0 ? "#fef3c7" : "#f8faff", border: `1px solid ${i === 0 ? "#fde68a" : "#e2e8f0"}`, minWidth: 110 }}>
               <div className="text-xs font-bold text-slate-500 mb-1">#{i+1}</div>
-              <div className="text-xl font-display font-bold" style={{ color: i === 0 ? "#d97706" : "#1d4ed8" }}>{r.priorityScore}</div>
+              <div className="text-xl font-display" style={{ color: i === 0 ? "#d97706" : "#1d4ed8" }}>{r.priorityScore}</div>
               <div className="text-xs text-slate-600 mt-1 truncate font-medium">{r.studentName.split(" ")[0]}</div>
               <div className="text-xs text-slate-400 truncate">{r.subject}</div>
               <span className={`text-xs px-1.5 py-0.5 rounded-full mt-1 inline-block ${getStatusClass(r.status)}`}>{r.status}</span>

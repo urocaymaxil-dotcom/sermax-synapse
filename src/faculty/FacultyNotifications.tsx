@@ -25,7 +25,7 @@ export default function FacultyNotifications({ notifications, onMarkRead, onMark
     <div>
       <div className="flex items-start justify-between mb-6 flex-wrap gap-4">
         <div>
-          <h1 className="font-display font-bold text-2xl text-slate-900">Notifications</h1>
+          <h1 className="font-display text-2xl text-slate-900">Notifications</h1>
           <p className="text-slate-500 text-sm mt-1">{unread} unread notification{unread !== 1 ? "s" : ""}</p>
         </div>
         {unread > 0 && (

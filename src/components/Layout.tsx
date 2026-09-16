@@ -1,3 +1,4 @@
+import { useState } from "react";
 import type { ViewType, AppNotification } from "../types";
 import logo from "@/imports/ChatGPT_Image_Sep_16__2026__02_42_11_AM-removebg-preview.png";
 
@@ -23,9 +24,12 @@ interface SidebarProps {
   notifications: AppNotification[];
   unreadMessages: number;
   onLogout: () => void;
+  theme: "light" | "dark";
+  onToggleTheme: () => void;
 }
 
-function Sidebar({ role, view, onNav, notifications, unreadMessages, onLogout }: SidebarProps) {
+function Sidebar({ role, view, onNav, notifications, unreadMessages, onLogout, theme, onToggleTheme }: SidebarProps) {
+  const [isLogoZoomed, setIsLogoZoomed] = useState(false);
   const unreadNotif = notifications.filter((n) => !n.read).length;
 
   const facultyNav: NavItem[] = [
@@ -52,14 +56,14 @@ function Sidebar({ role, view, onNav, notifications, unreadMessages, onLogout }:
   const nav = role === "faculty" ? facultyNav : studentNav;
 
   return (
-    <div className="flex flex-col h-full" style={{ background: "white", borderRight: "1px solid #e2e8f0", width: 240 }}>
+    <div className="flex flex-col h-full transition-colors" style={{ background: "var(--theme-bg-surface)", borderRight: "1px solid var(--theme-border)", width: 240 }}>
       {/* Logo area */}
-      <div className="flex items-center gap-3 px-5 py-5" style={{ borderBottom: "1px solid #f1f5f9" }}>
+      <div className="flex items-center gap-3 px-5 py-5 cursor-pointer hover:opacity-80 transition-opacity" style={{ borderBottom: "1px solid var(--theme-border)" }} onClick={() => setIsLogoZoomed(true)}>
         <div className="bg-white rounded-full p-1.5 shadow-sm flex items-center justify-center flex-shrink-0 transition-all duration-300 hover:scale-110 hover:shadow-md cursor-pointer group" style={{ width: 44, height: 44 }}>
           <img src={logo} alt="SerMax SYNAPSE" className="transition-transform duration-500 group-hover:rotate-12" style={{ width: "100%", height: "100%", objectFit: "contain" }} />
         </div>
         <div>
-          <div className="font-display font-bold text-sm leading-tight">
+          <div className="font-logo text-lg leading-tight">
             <span style={{ color: "#1d4ed8" }}>SERMAX</span>
             <span style={{ color: "#059669" }}> SYNAPSE</span>
           </div>
@@ -75,7 +79,7 @@ function Sidebar({ role, view, onNav, notifications, unreadMessages, onLogout }:
             <button
               key={item.id}
               onClick={() => onNav(item.id)}
-              className={`nav-item w-full flex items-center gap-3 px-4 py-2.5 rounded-lg mb-0.5 text-left transition-all ${isActive ? "nav-active" : "text-slate-600 hover:text-slate-900"}`}
+              className={`nav-item w-full flex items-center gap-3 px-4 py-2.5 rounded-lg mb-0.5 text-left transition-all ${isActive ? "nav-active" : "text-[var(--theme-text-muted)] hover:text-[var(--theme-text-main)] hover:bg-[var(--theme-bg-base)]"}`}
             >
               <span className={isActive ? "text-blue-600" : "text-slate-400"}>{item.icon}</span>
               <span className="text-sm font-medium flex-1">{item.label}</span>
@@ -88,16 +92,53 @@ function Sidebar({ role, view, onNav, notifications, unreadMessages, onLogout }:
       </nav>
 
       {/* Bottom */}
-      <div className="px-5 py-5" style={{ borderTop: "1px solid #f1f5f9" }}>
-        <p className="text-slate-400 text-xs font-display mb-3 leading-snug">Academic Support<br />Stronger Together.</p>
+      <div className="px-5 py-5" style={{ borderTop: "1px solid var(--theme-border)" }}>
+        <div className="flex items-center justify-between mb-4">
+          <span className="text-xs font-semibold text-[var(--theme-text-muted)]">Theme</span>
+          <button onClick={onToggleTheme} className="w-10 h-5 rounded-full relative transition-colors" style={{ background: theme === 'dark' ? '#10b981' : '#cbd5e1' }}>
+             <div className={`absolute top-0.5 left-0.5 w-4 h-4 rounded-full bg-white transition-transform ${theme === 'dark' ? 'translate-x-5' : 'translate-x-0'}`}></div>
+          </button>
+        </div>
+        <p className="text-[var(--theme-text-muted)] text-xs font-display mb-3 leading-snug">Academic Support<br />Stronger Together.</p>
         <button
           onClick={onLogout}
-          className="flex items-center gap-2 text-slate-400 hover:text-red-500 text-xs transition-colors"
+          className="flex items-center gap-2 text-[var(--theme-text-muted)] hover:text-red-500 text-xs transition-colors"
         >
           <Icon path="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4 M16 17l5-5-5-5 M21 12H9" size={14} />
           Sign out
         </button>
       </div>
+
+      {/* Logo Zoom Overlay */}
+      {isLogoZoomed && (
+        <div 
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/90 backdrop-blur-sm fade-in"
+          onClick={() => setIsLogoZoomed(false)}
+        >
+          <div className="relative max-w-4xl max-h-screen p-4 flex flex-col items-center">
+            <button 
+              className="absolute top-0 right-0 m-4 w-10 h-10 bg-white/10 hover:bg-white/20 rounded-full flex items-center justify-center text-white transition-colors"
+              onClick={() => setIsLogoZoomed(false)}
+            >
+              ✕
+            </button>
+            <div className="bg-white rounded-full p-8 shadow-[0_0_80px_rgba(255,255,255,0.2)]">
+              <img 
+                src={logo} 
+                alt="SerMax SYNAPSE Logo Enlarged" 
+                className="w-[300px] h-[300px] md:w-[500px] md:h-[500px] object-contain transition-transform duration-300 hover:scale-105" 
+                onClick={(e) => e.stopPropagation()}
+              />
+            </div>
+            <div className="mt-8 text-center" onClick={(e) => e.stopPropagation()}>
+              <div className="font-logo text-white text-3xl md:text-5xl" style={{ letterSpacing: -0.5 }}>
+                <span style={{ color: "#dbeafe" }}>SERMAX</span>{" "}
+                <span style={{ color: "#6ee7b7" }}>SYNAPSE</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
@@ -138,16 +179,16 @@ function TopBar({ role, view, notifications, unreadNotif, onNav, searchQuery, on
   const notifView: ViewType = role === "faculty" ? "faculty-notifications" : "student-notifications";
 
   return (
-    <div className="flex items-center gap-4 px-6 py-3" style={{ background: "white", borderBottom: "1px solid #e2e8f0", minHeight: 64 }}>
+    <div className="flex items-center gap-4 px-6 py-3 transition-colors" style={{ background: "var(--theme-bg-surface)", borderBottom: "1px solid var(--theme-border)", minHeight: 64 }}>
       {/* Search */}
-      <div className="flex items-center gap-2 flex-1 max-w-md rounded-lg px-3 py-2" style={{ background: "#f8faff", border: "1px solid #e2e8f0" }}>
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <div className="flex items-center gap-2 flex-1 max-w-md rounded-lg px-3 py-2 transition-colors" style={{ background: "var(--theme-bg-base)", border: "1px solid var(--theme-border)" }}>
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--theme-text-muted)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
           <circle cx="11" cy="11" r="8" /><path d="m21 21-4.35-4.35" />
         </svg>
         <input
           type="text"
           placeholder="Search students, subjects, or consultation requests..."
-          className="bg-transparent text-sm text-slate-700 flex-1 min-w-0"
+          className="bg-transparent text-sm text-[var(--theme-text-main)] flex-1 min-w-0"
           style={{ border: "none", outline: "none", boxShadow: "none" }}
           value={searchQuery}
           onChange={(e) => onSearch(e.target.value)}
@@ -201,15 +242,17 @@ interface LayoutProps {
   children: React.ReactNode;
   searchQuery: string;
   onSearch: (q: string) => void;
+  theme: "light" | "dark";
+  onToggleTheme: () => void;
 }
 
-export default function Layout({ role, view, onNav, notifications, unreadMessages, onLogout, children, searchQuery, onSearch }: LayoutProps) {
+export default function Layout({ role, view, onNav, notifications, unreadMessages, onLogout, children, searchQuery, onSearch, theme, onToggleTheme }: LayoutProps) {
   const unreadNotif = notifications.filter((n) => !n.read).length;
 
   return (
-    <div className="flex h-screen overflow-hidden" style={{ background: "#eef2ff" }}>
+    <div className="flex h-screen overflow-hidden transition-colors" style={{ background: "var(--theme-bg-base)" }}>
       <div className="flex-shrink-0 h-full overflow-hidden">
-        <Sidebar role={role} view={view} onNav={onNav} notifications={notifications} unreadMessages={unreadMessages} onLogout={onLogout} />
+        <Sidebar role={role} view={view} onNav={onNav} notifications={notifications} unreadMessages={unreadMessages} onLogout={onLogout} theme={theme} onToggleTheme={onToggleTheme} />
       </div>
       <div className="flex-1 flex flex-col overflow-hidden min-w-0">
         <TopBar role={role} view={view} notifications={notifications} unreadNotif={unreadNotif} onNav={onNav} searchQuery={searchQuery} onSearch={onSearch} />

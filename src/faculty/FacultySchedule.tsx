@@ -40,7 +40,7 @@ export default function FacultySchedule({ schedule }: Props) {
     <div>
       <div className="flex items-start justify-between mb-6 flex-wrap gap-4">
         <div>
-          <h1 className="font-display font-bold text-2xl text-slate-900">My Schedule</h1>
+          <h1 className="font-display text-2xl text-slate-900">My Schedule</h1>
           <p className="text-slate-500 text-sm mt-1">Academic Year 2026–2027, First Semester</p>
         </div>
         <div className="flex items-center gap-3">
@@ -79,7 +79,7 @@ export default function FacultySchedule({ schedule }: Props) {
           <div style={{ width: 60, flexShrink: 0 }} />
           {daysToShow.map((day) => (
             <div key={day} className="flex-1 text-center py-3" style={{ borderLeft: "1px solid #f1f5f9" }}>
-              <div className="font-display font-semibold text-sm text-slate-700">{day}</div>
+              <div className="font-heading text-sm text-slate-700">{day}</div>
               {day === "Monday" && (
                 <div className="text-xs text-blue-600 font-medium">Today</div>
               )}
@@ -152,7 +152,7 @@ export default function FacultySchedule({ schedule }: Props) {
 
       {/* Event list summary */}
       <div className="mt-6">
-        <h2 className="font-display font-semibold text-slate-800 mb-3 text-base">
+        <h2 className="font-heading text-slate-800 mb-3 text-base">
           {viewMode === "week" ? "All This Week" : `${selectedDay}'s Events`}
         </h2>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
