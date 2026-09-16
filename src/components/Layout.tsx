@@ -153,6 +153,7 @@ interface TopBarProps {
   onSearch: (q: string) => void;
   profilePhoto: string | null;
   userName: string;
+  onToggleSidebar: () => void;
 }
 
 const VIEW_TITLES: Record<string, string> = {
@@ -173,7 +174,7 @@ const VIEW_TITLES: Record<string, string> = {
   "student-profile": "Profile",
 };
 
-function TopBar({ role, view, notifications, unreadNotif, onNav, searchQuery, onSearch, profilePhoto, userName }: TopBarProps) {
+function TopBar({ role, view, notifications, unreadNotif, onNav, searchQuery, onSearch, profilePhoto, userName, onToggleSidebar }: TopBarProps) {
   const name = userName;
   const title = role === "faculty" ? "Faculty Member" : "BSCS 2A";
   const initials = userName ? userName.split(" ").map(n => n[0]).join("").substring(0, 2).toUpperCase() : (role === "faculty" ? "MS" : "JD");
@@ -181,9 +182,16 @@ function TopBar({ role, view, notifications, unreadNotif, onNav, searchQuery, on
   const notifView: ViewType = role === "faculty" ? "faculty-notifications" : "student-notifications";
 
   return (
-    <div className="flex items-center gap-4 px-6 py-3 transition-colors" style={{ background: "var(--theme-bg-surface)", borderBottom: "1px solid var(--theme-border)", minHeight: 64 }}>
+    <div className="flex items-center gap-2 md:gap-4 px-4 md:px-6 py-3 transition-colors" style={{ background: "var(--theme-bg-surface)", borderBottom: "1px solid var(--theme-border)", minHeight: 64 }}>
+      {/* Hamburger menu for mobile */}
+      <button onClick={onToggleSidebar} className="md:hidden p-1.5 -ml-2 rounded-lg hover:bg-slate-100 text-[var(--theme-text-muted)] transition-colors">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/>
+        </svg>
+      </button>
+
       {/* Search */}
-      <div className="flex items-center gap-2 flex-1 max-w-md rounded-lg px-3 py-2 transition-colors" style={{ background: "var(--theme-bg-base)", border: "1px solid var(--theme-border)" }}>
+      <div className="flex items-center gap-2 flex-1 max-w-md rounded-lg px-2 sm:px-3 py-2 transition-colors" style={{ background: "var(--theme-bg-base)", border: "1px solid var(--theme-border)" }}>
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--theme-text-muted)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
           <circle cx="11" cy="11" r="8" /><path d="m21 21-4.35-4.35" />
         </svg>
@@ -252,15 +260,31 @@ interface LayoutProps {
 
 export default function Layout({ role, view, onNav, notifications, unreadMessages, onLogout, children, searchQuery, onSearch, theme, onToggleTheme, profilePhoto, userName }: LayoutProps) {
   const unreadNotif = notifications.filter((n) => !n.read).length;
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+
+  const handleNav = (v: ViewType) => {
+    onNav(v);
+    setIsSidebarOpen(false);
+  };
 
   return (
-    <div className="flex h-screen overflow-hidden transition-colors" style={{ background: "var(--theme-bg-base)" }}>
-      <div className="flex-shrink-0 h-full overflow-hidden">
-        <Sidebar role={role} view={view} onNav={onNav} notifications={notifications} unreadMessages={unreadMessages} onLogout={onLogout} theme={theme} onToggleTheme={onToggleTheme} />
+    <div className="flex h-screen overflow-hidden transition-colors relative" style={{ background: "var(--theme-bg-base)" }}>
+      {/* Mobile overlay */}
+      {isSidebarOpen && (
+        <div 
+          className="fixed inset-0 bg-slate-900/50 z-30 md:hidden backdrop-blur-sm fade-in"
+          onClick={() => setIsSidebarOpen(false)}
+        />
+      )}
+
+      {/* Sidebar container */}
+      <div className={`flex-shrink-0 h-full overflow-hidden absolute md:relative z-40 transition-transform duration-300 ease-in-out ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'}`}>
+        <Sidebar role={role} view={view} onNav={handleNav} notifications={notifications} unreadMessages={unreadMessages} onLogout={onLogout} theme={theme} onToggleTheme={onToggleTheme} />
       </div>
+      
       <div className="flex-1 flex flex-col overflow-hidden min-w-0">
-        <TopBar role={role} view={view} notifications={notifications} unreadNotif={unreadNotif} onNav={onNav} searchQuery={searchQuery} onSearch={onSearch} profilePhoto={profilePhoto} userName={userName} />
-        <main className="flex-1 overflow-y-auto p-6 fade-in">
+        <TopBar role={role} view={view} notifications={notifications} unreadNotif={unreadNotif} onNav={onNav} searchQuery={searchQuery} onSearch={onSearch} profilePhoto={profilePhoto} userName={userName} onToggleSidebar={() => setIsSidebarOpen(true)} />
+        <main className="flex-1 overflow-y-auto p-4 md:p-6 fade-in">
           {children}
         </main>
       </div>
