@@ -1,6 +1,7 @@
 import { ConsultationRequest, ScheduleEvent } from './types';
 
-const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:3001/api';
+const ENV_URL = import.meta.env.VITE_API_URL;
+const API_BASE = ENV_URL ? `${ENV_URL}/api` : 'http://localhost:3001/api';
 
 export const api = {
   // Requests

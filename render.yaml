@@ -25,8 +25,7 @@ services:
         fromService:
           type: web
           name: synapse-backend
-          property: host
-          format: https://{host}/api
+          property: url
 
 databases:
   - name: synapse-db
